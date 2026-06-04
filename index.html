@@ -318,7 +318,60 @@ input:focus { outline: none; border-color: var(--pink); box-shadow: 0 0 0 3px rg
 .mt8    { margin-top: 8px; }
 .mt12   { margin-top: 12px; }
 
-/* ── 인쇄 스타일 (별도 창) ── */
+
+/* ── 인쇄 전용 ── */
+#printFrame { display: none; }
+
+@media print {
+  body > .app,
+  body > *:not(#printFrame) { display: none !important; }
+  #printFrame {
+    display: block !important;
+    font-family: 'Malgun Gothic','Apple SD Gothic Neo','Noto Sans KR',sans-serif;
+    font-size: 13px; color: #1a1a1a;
+    padding: 0; margin: 0;
+  }
+  @page { size: A4; margin: 14mm 14mm 18mm; }
+  /* 결과지 내부 스타일 */
+  #printFrame .rh { display:flex; justify-content:space-between; align-items:flex-end; border-bottom:3px solid #c2185b; padding-bottom:14px; margin-bottom:20px; }
+  #printFrame .rh-left h1 { font-size:18px; font-weight:800; color:#c2185b; letter-spacing:-.5px; }
+  #printFrame .rh-left p  { font-size:11px; color:#999; margin-top:3px; }
+  #printFrame .rh-right   { font-size:11px; color:#999; text-align:right; line-height:1.7; }
+  #printFrame .info-row   { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:18px; }
+  #printFrame .info-box   { background:#fdf0f8; border-radius:8px; padding:10px 13px; border:1px solid #f5c6e0; }
+  #printFrame .info-box .lbl { font-size:10px; color:#c2185b; font-weight:700; letter-spacing:.5px; text-transform:uppercase; margin-bottom:3px; }
+  #printFrame .info-box .val { font-size:14px; font-weight:700; }
+  #printFrame .info-box .sub { font-size:10px; color:#666; margin-top:1px; }
+  #printFrame .sec        { margin-bottom:18px; }
+  #printFrame .sec-title  { font-size:13px; font-weight:800; border-left:4px solid #c2185b; padding-left:10px; margin-bottom:12px; }
+  #printFrame .sum-row    { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; }
+  #printFrame .sum-box    { border-radius:10px; padding:12px 14px; border:1px solid #e0e0e0; }
+  #printFrame .sum-box.exp{ background:#fdf0f8 !important; border-color:#f5c6e0 !important; }
+  #printFrame .sum-box.rec{ background:#e3f2fd !important; border-color:#90caf9 !important; }
+  #printFrame .sum-box h3 { font-size:13px; font-weight:800; margin-bottom:9px; }
+  #printFrame .sum-box h3.exp { color:#c2185b; }
+  #printFrame .sum-box h3.rec { color:#1565c0; }
+  #printFrame .sum-line   { display:flex; justify-content:space-between; padding:4px 0; font-size:12px; border-bottom:1px solid rgba(0,0,0,.06); }
+  #printFrame .sum-line:last-child { border-bottom:none; }
+  #printFrame .sum-line .k { color:#666; }
+  #printFrame .sum-line .v { font-weight:700; }
+  #printFrame .score-big  { font-size:19px; font-weight:800; }
+  #printFrame .badge-ok   { display:inline-block; background:#e8f5e9 !important; color:#2e7d32; padding:2px 9px; border-radius:12px; font-size:11px; font-weight:700; }
+  #printFrame .badge-warn { display:inline-block; background:#fff3e0 !important; color:#e65100; padding:2px 9px; border-radius:12px; font-size:11px; font-weight:700; }
+  #printFrame .badge-bad  { display:inline-block; background:#ffebee !important; color:#b71c1c; padding:2px 9px; border-radius:12px; font-size:11px; font-weight:700; }
+  #printFrame table       { width:100%; border-collapse:collapse; font-size:12px; margin-bottom:4px; }
+  #printFrame th          { background:#f9f0f5 !important; color:#c2185b; font-weight:700; padding:7px 10px; border:1px solid #f0d0e0; font-size:11px; text-align:left; }
+  #printFrame td          { padding:7px 10px; border:1px solid #eee; vertical-align:middle; }
+  #printFrame tr:nth-child(even) td { background:#fafafa !important; }
+  #printFrame .bar-track  { height:12px; background:#f0f0f0 !important; border-radius:6px; overflow:hidden; border:1px solid #e0e0e0; margin-top:6px; }
+  #printFrame .bar-fill   { height:100%; border-radius:6px; display:flex; align-items:center; justify-content:flex-end; padding-right:6px; }
+  #printFrame .bar-fill span { font-size:9px; color:#fff; font-weight:700; }
+  #printFrame .guide      { background:#f0f9ff !important; border:1px solid #bae6fd; border-radius:8px; padding:10px 13px; margin-top:14px; font-size:11px; color:#0369a1; line-height:1.8; }
+  #printFrame .footer     { margin-top:18px; padding-top:10px; border-top:1px solid #eee; font-size:10px; color:#999; text-align:center; }
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
 </style>
 </head>
 <body>
@@ -935,173 +988,113 @@ function resetAll(){
 function doPrint(){
   const es=S.eScore, rs=S.rScore, g=S.grp;
   const eEq=getEq(es,'exp'), rEq=getEq(rs,'rec');
-  const eP=getPct(es,g,'exp'), rP=getPct(rs,g,'rec');   // 객체 {label,val,barPct}
-  const eSD=getSD(es,g,'exp'),  rSD=getSD(rs,g,'rec');
+  const eP=getPct(es,g,'exp'), rP=getPct(rs,g,'rec');
+  const eSD=getSD(es,g,'exp'), rSD=getSD(rs,g,'rec');
   const nm=NORM[g];
   const eWrong=Object.values(S.eI).filter(v=>v===false).length;
   const rWrong=Object.values(S.rI).filter(v=>v===false).length;
   const pC=p=>p>=25?'#2e7d32':p>=10?'#e65100':'#b71c1c';
-  const sC=lv=>lv===1?'#2e7d32':lv===-1?'#e65100':'#b71c1c';
   const sBadge=lv=>lv===1?'badge-ok':lv===-1?'badge-warn':'badge-bad';
 
-  const html=`<!DOCTYPE html>
-<html lang="ko"><head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>REVT 결과지 — ${S.name}</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Malgun Gothic','Apple SD Gothic Neo','Noto Sans KR',sans-serif;font-size:13px;color:#1a1a1a;background:#fff}
-@page{size:A4;margin:14mm 14mm 18mm}
-.page{max-width:720px;margin:0 auto;padding:28px 24px}
-/* 헤더 */
-.rh{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #c2185b;padding-bottom:14px;margin-bottom:20px}
-.rh-left h1{font-size:19px;font-weight:800;color:#c2185b;letter-spacing:-.5px}
-.rh-left p{font-size:11px;color:#999;margin-top:3px}
-.rh-right{font-size:11px;color:#999;text-align:right;line-height:1.7}
-/* 아동 정보 */
-.info-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
-.info-box{background:#fdf0f8;border-radius:8px;padding:10px 13px;border:1px solid #f5c6e0}
-.info-box .lbl{font-size:10px;color:#c2185b;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:3px}
-.info-box .val{font-size:14px;font-weight:700}
-.info-box .sub{font-size:10px;color:#666;margin-top:1px}
-/* 섹션 */
-.sec{margin-bottom:20px}
-.sec-title{font-size:13px;font-weight:800;border-left:4px solid #c2185b;padding-left:10px;margin-bottom:12px}
-/* 요약 카드 */
-.sum-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
-.sum-box{border-radius:10px;padding:13px 14px;border:1px solid #e0e0e0}
-.sum-box.exp{background:#fdf0f8;border-color:#f5c6e0}
-.sum-box.rec{background:#e3f2fd;border-color:#90caf9}
-.sum-box h3{font-size:13px;font-weight:800;margin-bottom:10px}
-.sum-box h3.exp{color:#c2185b}.sum-box h3.rec{color:#1565c0}
-.sum-line{display:flex;justify-content:space-between;padding:4px 0;font-size:12px;border-bottom:1px solid rgba(0,0,0,.06)}
-.sum-line:last-child{border-bottom:none}
-.sum-line .k{color:#666}
-.sum-line .v{font-weight:700}
-.score-big{font-size:20px;font-weight:800}
-/* 뱃지 */
-.badge-ok{display:inline-block;background:#e8f5e9;color:#2e7d32;padding:2px 9px;border-radius:12px;font-size:11px;font-weight:700}
-.badge-warn{display:inline-block;background:#fff3e0;color:#e65100;padding:2px 9px;border-radius:12px;font-size:11px;font-weight:700}
-.badge-bad{display:inline-block;background:#ffebee;color:#b71c1c;padding:2px 9px;border-radius:12px;font-size:11px;font-weight:700}
-/* 표 */
-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:4px}
-th{background:#f9f0f5;color:#c2185b;font-weight:700;padding:8px 10px;border:1px solid #f0d0e0;font-size:11px;text-align:left}
-td{padding:8px 10px;border:1px solid #eee;vertical-align:middle}
-tr:nth-child(even) td{background:#fafafa}
-/* 바 */
-.bar-track{height:12px;background:#f0f0f0;border-radius:6px;overflow:hidden;border:1px solid #e0e0e0;margin-top:6px}
-.bar-fill{height:100%;border-radius:6px;display:flex;align-items:center;justify-content:flex-end;padding-right:6px}
-.bar-fill span{font-size:9px;color:#fff;font-weight:700}
-/* 안내 */
-.guide{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:11px 13px;margin-top:16px;font-size:11px;color:#0369a1;line-height:1.8}
-.guide b{color:#0369a1}
-.footer{margin-top:20px;padding-top:12px;border-top:1px solid #eee;font-size:10px;color:#999;text-align:center}
-@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
-</style></head><body>
-<div class="page">
-  <div class="rh">
-    <div class="rh-left">
-      <h1>REVT 수용·표현 어휘력 검사 결과지</h1>
-      <p>Receptive &amp; Expressive Vocabulary Test (김영태 외, 2009)</p>
-    </div>
-    <div class="rh-right">평가일: ${S.testDate}<br>출력일: ${new Date().toLocaleDateString('ko-KR')}</div>
-  </div>
-
-  <div class="info-row">
-    <div class="info-box"><div class="lbl">아동 이름</div><div class="val">${S.name}</div></div>
-    <div class="info-box"><div class="lbl">생년월일</div><div class="val">${S.birthDate}</div></div>
-    <div class="info-box"><div class="lbl">생활연령</div><div class="val">만 ${S.y}세 ${S.m}개월</div><div class="sub">${g} · ${S.tm}개월</div></div>
-  </div>
-
-  <div class="sec">
-    <div class="sec-title">종합 결과 요약</div>
-    <div class="sum-row">
-      <div class="sum-box exp">
-        <h3 class="exp">📢 표현어휘력</h3>
-        <div class="sum-line"><span class="k">원점수</span><span class="v score-big" style="color:#c2185b">${es}점</span></div>
-        <div class="sum-line"><span class="k">등가월령</span><span class="v">${eEq.mo}</span></div>
-        <div class="sum-line"><span class="k">등가연령</span><span class="v">${eEq.st}</span></div>
-        <div class="sum-line"><span class="k">백분위</span><span class="v" style="color:${pC(eP.val)}">${eP.label}</span></div>
-        <div class="sum-line"><span class="k">SD 판정</span><span class="${sBadge(eSD.lv)}">${eSD.l}</span></div>
-        <div class="bar-track"><div class="bar-fill" style="width:${eP.barPct}%;background:#c2185b"><span>${eP.label}</span></div></div>
+  // 인쇄용 HTML을 같은 페이지의 숨겨진 div에 삽입 후 window.print() 호출
+  const printHTML = `
+    <div class="rh">
+      <div class="rh-left">
+        <h1>REVT 수용·표현 어휘력 검사 결과지</h1>
+        <p>Receptive &amp; Expressive Vocabulary Test (김영태 외, 2009)</p>
       </div>
-      <div class="sum-box rec">
-        <h3 class="rec">👂 수용어휘력</h3>
-        <div class="sum-line"><span class="k">원점수</span><span class="v score-big" style="color:#1565c0">${rs}점</span></div>
-        <div class="sum-line"><span class="k">등가월령</span><span class="v">${rEq.mo}</span></div>
-        <div class="sum-line"><span class="k">등가연령</span><span class="v">${rEq.st}</span></div>
-        <div class="sum-line"><span class="k">백분위</span><span class="v" style="color:${pC(rP.val)}">${rP.label}</span></div>
-        <div class="sum-line"><span class="k">SD 판정</span><span class="${sBadge(rSD.lv)}">${rSD.l}</span></div>
-        <div class="bar-track"><div class="bar-fill" style="width:${rP.barPct}%;background:#1565c0"><span>${rP.label}</span></div></div>
+      <div class="rh-right">평가일: ${S.testDate}<br>출력일: ${new Date().toLocaleDateString('ko-KR')}</div>
+    </div>
+    <div class="info-row">
+      <div class="info-box"><div class="lbl">아동 이름</div><div class="val">${S.name}</div></div>
+      <div class="info-box"><div class="lbl">생년월일</div><div class="val">${S.birthDate}</div></div>
+      <div class="info-box"><div class="lbl">생활연령</div><div class="val">만 ${S.y}세 ${S.m}개월</div><div class="sub">${g} · ${S.tm}개월</div></div>
+    </div>
+    <div class="sec">
+      <div class="sec-title">종합 결과 요약</div>
+      <div class="sum-row">
+        <div class="sum-box exp">
+          <h3 class="exp">📢 표현어휘력</h3>
+          <div class="sum-line"><span class="k">원점수</span><span class="v score-big" style="color:#c2185b">${es}점</span></div>
+          <div class="sum-line"><span class="k">등가월령</span><span class="v">${eEq.mo}</span></div>
+          <div class="sum-line"><span class="k">등가연령</span><span class="v">${eEq.st}</span></div>
+          <div class="sum-line"><span class="k">백분위</span><span class="v" style="color:${pC(eP.val)}">${eP.label}</span></div>
+          <div class="sum-line"><span class="k">SD 판정</span><span class="${sBadge(eSD.lv)}">${eSD.l}</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width:${eP.barPct}%;background:#c2185b"><span>${eP.label}</span></div></div>
+        </div>
+        <div class="sum-box rec">
+          <h3 class="rec">👂 수용어휘력</h3>
+          <div class="sum-line"><span class="k">원점수</span><span class="v score-big" style="color:#1565c0">${rs}점</span></div>
+          <div class="sum-line"><span class="k">등가월령</span><span class="v">${rEq.mo}</span></div>
+          <div class="sum-line"><span class="k">등가연령</span><span class="v">${rEq.st}</span></div>
+          <div class="sum-line"><span class="k">백분위</span><span class="v" style="color:${pC(rP.val)}">${rP.label}</span></div>
+          <div class="sum-line"><span class="k">SD 판정</span><span class="${sBadge(rSD.lv)}">${rSD.l}</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width:${rP.barPct}%;background:#1565c0"><span>${rP.label}</span></div></div>
+        </div>
       </div>
     </div>
-  </div>
+    <div class="sec">
+      <div class="sec-title">규준 비교 — 표-27 연령별 평균 및 표준편차 (연령 집단: ${g})</div>
+      ${nm ? `<table>
+        <tr><th>구분</th><th>원점수</th><th>연령 평균</th><th>표준편차</th><th>-1SD 기준</th><th>-2SD 기준</th><th>판정</th></tr>
+        <tr><td>표현어휘</td><td style="font-size:16px;font-weight:800;color:#c2185b">${es}</td><td>${nm.exp.mean}</td><td>${nm.exp.sd}</td>
+            <td style="color:#e65100;font-weight:700">${(nm.exp.mean-nm.exp.sd).toFixed(2)}</td>
+            <td style="color:#b71c1c;font-weight:700">${(nm.exp.mean-2*nm.exp.sd).toFixed(2)}</td>
+            <td><span class="${sBadge(eSD.lv)}">${eSD.l}</span></td></tr>
+        <tr><td>수용어휘</td><td style="font-size:16px;font-weight:800;color:#1565c0">${rs}</td><td>${nm.rec.mean}</td><td>${nm.rec.sd}</td>
+            <td style="color:#e65100;font-weight:700">${(nm.rec.mean-nm.rec.sd).toFixed(2)}</td>
+            <td style="color:#b71c1c;font-weight:700">${(nm.rec.mean-2*nm.rec.sd).toFixed(2)}</td>
+            <td><span class="${sBadge(rSD.lv)}">${rSD.l}</span></td></tr>
+      </table>` : '<p style="color:#999;font-size:12px">해당 연령 규준 없음</p>'}
+    </div>
+    <div class="sec">
+      <div class="sec-title">등가연령 규준 — 표-28</div>
+      <table>
+        <tr><th>구분</th><th>원점수</th><th>등가월령</th><th>등가연령</th></tr>
+        <tr><td>표현어휘</td><td>${es}점</td><td>${eEq.mo}</td><td>${eEq.st}</td></tr>
+        <tr><td>수용어휘</td><td>${rs}점</td><td>${rEq.mo}</td><td>${rEq.st}</td></tr>
+      </table>
+    </div>
+    <div class="sec">
+      <div class="sec-title">백분위 규준 — 표-29 (연령 집단: ${g})</div>
+      <table>
+        <tr><th>구분</th><th>원점수</th><th>백분위</th><th>해석</th></tr>
+        <tr><td>표현어휘</td><td>${es}점</td>
+            <td style="color:${pC(eP.val)};font-weight:800">${eP.label}</td>
+            <td>${eP.val>=50?'평균 이상':eP.val>=25?'평균 하':eP.val>=10?'약간 낮음':'매우 낮음'}</td></tr>
+        <tr><td>수용어휘</td><td>${rs}점</td>
+            <td style="color:${pC(rP.val)};font-weight:800">${rP.label}</td>
+            <td>${rP.val>=50?'평균 이상':rP.val>=25?'평균 하':rP.val>=10?'약간 낮음':'매우 낮음'}</td></tr>
+      </table>
+    </div>
+    <div class="sec">
+      <div class="sec-title">검사 실시 정보</div>
+      <table>
+        <tr><th>구분</th><th>기초선</th><th>최고한계선</th><th>오답 수</th><th>원점수</th></tr>
+        <tr><td>표현어휘</td><td>${S.eBL?S.eBL+'번':'미확립'}</td><td>${S.eCL?S.eCL+'번':'끝까지 실시'}</td><td>${eWrong}개</td><td>${es}점</td></tr>
+        <tr><td>수용어휘</td><td>${S.rBL?S.rBL+'번':'미확립'}</td><td>${S.rCL?S.rCL+'번':'끝까지 실시'}</td><td>${rWrong}개</td><td>${rs}점</td></tr>
+      </table>
+    </div>
+    <div class="guide">
+      <b>📌 검사 해석 안내</b><br>
+      • <b>정상범주</b>: 연령 평균 -1SD 이상 &nbsp;|&nbsp; <b>약간 낮음</b>: -1SD ~ -2SD &nbsp;|&nbsp; <b>언어발달지연</b>: -2SD 미만<br>
+      • 백분위 <b>10%ile 미만</b>은 언어치료적 개입을 적극 고려하시기 바랍니다.<br>
+      • 본 결과는 REVT(수용·표현 어휘력 검사, 김영태·홍경훈·김경희·장혜성·이주연, 서울장애인종합복지관, 2009) 규준에 따라 산출되었습니다.
+    </div>
+    <div class="footer">
+      REVT 수용·표현 어휘력 검사 결과지 &nbsp;|&nbsp; ${S.name} &nbsp;|&nbsp; 평가일 ${S.testDate} &nbsp;|&nbsp; 출력일 ${new Date().toLocaleDateString('ko-KR')}
+    </div>
+  `;
 
-  <div class="sec">
-    <div class="sec-title">규준 비교 — 표-27 연령별 평균 및 표준편차 (연령 집단: ${g})</div>
-    ${nm?`<table>
-      <tr><th>구분</th><th>원점수</th><th>연령 평균</th><th>표준편차</th><th>-1SD 기준</th><th>-2SD 기준</th><th>판정</th></tr>
-      <tr><td>표현어휘</td><td style="font-size:16px;font-weight:800;color:#c2185b">${es}</td><td>${nm.exp.mean}</td><td>${nm.exp.sd}</td>
-          <td style="color:#e65100;font-weight:700">${(nm.exp.mean-nm.exp.sd).toFixed(2)}</td>
-          <td style="color:#b71c1c;font-weight:700">${(nm.exp.mean-2*nm.exp.sd).toFixed(2)}</td>
-          <td><span class="${sBadge(eSD.lv)}">${eSD.l}</span></td></tr>
-      <tr><td>수용어휘</td><td style="font-size:16px;font-weight:800;color:#1565c0">${rs}</td><td>${nm.rec.mean}</td><td>${nm.rec.sd}</td>
-          <td style="color:#e65100;font-weight:700">${(nm.rec.mean-nm.rec.sd).toFixed(2)}</td>
-          <td style="color:#b71c1c;font-weight:700">${(nm.rec.mean-2*nm.rec.sd).toFixed(2)}</td>
-          <td><span class="${sBadge(rSD.lv)}">${rSD.l}</span></td></tr>
-    </table>`:'<p style="color:#999;font-size:12px">해당 연령 규준 없음</p>'}
-  </div>
+  // 숨겨진 인쇄 프레임에 내용 삽입
+  const frame = document.getElementById('printFrame');
+  frame.innerHTML = printHTML;
 
-  <div class="sec">
-    <div class="sec-title">등가연령 규준 — 표-28</div>
-    <table>
-      <tr><th>구분</th><th>원점수</th><th>등가월령</th><th>등가연령</th></tr>
-      <tr><td>표현어휘</td><td>${es}점</td><td>${eEq.mo}</td><td>${eEq.st}</td></tr>
-      <tr><td>수용어휘</td><td>${rs}점</td><td>${rEq.mo}</td><td>${rEq.st}</td></tr>
-    </table>
-  </div>
+  // 인쇄 실행
+  window.print();
 
-  <div class="sec">
-    <div class="sec-title">백분위 규준 — 표-29 (연령 집단: ${g})</div>
-    <table>
-      <tr><th>구분</th><th>원점수</th><th>백분위</th><th>해석</th></tr>
-      <tr><td>표현어휘</td><td>${es}점</td>
-          <td style="color:${pC(eP.val)};font-weight:800">${eP.label}</td>
-          <td>${eP.val>=50?'평균 이상':eP.val>=25?'평균 하':eP.val>=10?'약간 낮음':'매우 낮음'}</td></tr>
-      <tr><td>수용어휘</td><td>${rs}점</td>
-          <td style="color:${pC(rP.val)};font-weight:800">${rP.label}</td>
-          <td>${rP.val>=50?'평균 이상':rP.val>=25?'평균 하':rP.val>=10?'약간 낮음':'매우 낮음'}</td></tr>
-    </table>
-  </div>
-
-  <div class="sec">
-    <div class="sec-title">검사 실시 정보</div>
-    <table>
-      <tr><th>구분</th><th>기초선</th><th>최고한계선</th><th>오답 수</th><th>원점수</th></tr>
-      <tr><td>표현어휘</td><td>${S.eBL?S.eBL+'번':'미확립'}</td><td>${S.eCL?S.eCL+'번':'끝까지 실시'}</td><td>${eWrong}개</td><td>${es}점</td></tr>
-      <tr><td>수용어휘</td><td>${S.rBL?S.rBL+'번':'미확립'}</td><td>${S.rCL?S.rCL+'번':'끝까지 실시'}</td><td>${rWrong}개</td><td>${rs}점</td></tr>
-    </table>
-  </div>
-
-  <div class="guide">
-    <b>📌 검사 해석 안내</b><br>
-    • <b>정상범주</b>: 연령 평균 -1SD 이상 &nbsp;|&nbsp; <b>약간 낮음</b>: -1SD ~ -2SD &nbsp;|&nbsp; <b>언어발달지연</b>: -2SD 미만<br>
-    • 백분위 <b>10%ile 미만</b>은 언어치료적 개입을 적극 고려하시기 바랍니다.<br>
-    • 본 결과는 REVT(수용·표현 어휘력 검사, 김영태·홍경훈·김경희·장혜성·이주연, 서울장애인종합복지관, 2009) 규준에 따라 산출되었습니다.
-  </div>
-
-  <div class="footer">
-    REVT 수용·표현 어휘력 검사 결과지 &nbsp;|&nbsp; ${S.name} &nbsp;|&nbsp; 평가일 ${S.testDate} &nbsp;|&nbsp; 출력일 ${new Date().toLocaleDateString('ko-KR')}
-  </div>
-</div>
-<script>window.onload=function(){window.print();}<\/script>
-</body></html>`;
-
-  const w=window.open('','_blank','width=820,height=960');
-  if(!w){alert('팝업이 차단되었습니다.\n브라우저에서 팝업 허용 후 다시 시도해 주세요.');return;}
-  w.document.write(html);
-  w.document.close();
+  // 인쇄 후 프레임 초기화 (약간 딜레이)
+  setTimeout(() => { frame.innerHTML = ''; }, 1000);
 }
 
 /* ============================================================
@@ -1109,5 +1102,6 @@ tr:nth-child(even) td{background:#fafafa}
 ============================================================ */
 render();
 </script>
+<div id="printFrame"></div>
 </body>
 </html>
