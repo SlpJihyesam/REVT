@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="REVT 검사">
+<meta name="theme-color" content="#c2185b">
+<title>REVT 수용·표현 어휘력 검사</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ── 기본 리셋 & 변수 ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --pink:       #c2185b;
+  --pink-mid:   #e91e8c;
+  --pink-light: #fce4f3;
+  --pink-pale:  #fdf0f8;
+  --blue:       #1565c0;
+  --blue-light: #e3f2fd;
+  --green:      #2e7d32;
+  --green-light:#e8f5e9;
+  --amber:      #e65100;
+  --amber-light:#fff3e0;
+  --red:        #b71c1c;
+  --red-light:  #ffebee;
+  --gray:       #546e7a;
+  --gray-light: #f5f7f8;
+  --border:     #e0e0e0;
+  --text:       #1a1a2e;
+  --text-sub:   #546e7a;
+  --radius:     10px;
+  --radius-lg:  16px;
+  --shadow:     0 2px 12px rgba(194,24,91,.08);
+  --shadow-lg:  0 6px 28px rgba(194,24,91,.14);
+}
+html { font-size: 15px; }
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: #fafafa;
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ── 레이아웃 ── */
+.app { max-width: 500px; margin: 0 auto; padding: 0 0 100px; }
+
+/* ── 헤더 ── */
+.header {
+  background: linear-gradient(135deg, #c2185b 0%, #e91e8c 60%, #f06292 100%);
+  color: white;
+  padding: 22px 20px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 3px 16px rgba(194,24,91,.30);
+}
+.header-inner { display: flex; align-items: center; justify-content: space-between; }
+.header h1 { font-size: 17px; font-weight: 700; letter-spacing: -.3px; }
+.header p  { font-size: 11px; opacity: .8; margin-top: 2px; }
+.header-badge {
+  background: rgba(255,255,255,.2);
+  border: 1px solid rgba(255,255,255,.35);
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* ── 스텝 바 ── */
+.step-wrap { padding: 14px 20px 0; }
+.step-bar { display: flex; gap: 5px; margin-bottom: 6px; }
+.step-seg {
+  flex: 1; height: 5px; border-radius: 3px;
+  background: var(--border); transition: background .35s;
+}
+.step-seg.done   { background: var(--pink-mid); }
+.step-seg.active { background: var(--pink); }
+.step-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-sub); padding: 0 1px; }
+.step-labels span.cur { color: var(--pink); font-weight: 600; }
+
+/* ── 콘텐츠 ── */
+.content { padding: 14px 16px 0; }
+
+/* ── 카드 ── */
+.card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+}
+.card-title {
+  font-size: 13px; font-weight: 600; color: var(--text-sub);
+  margin-bottom: 14px; display: flex; align-items: center; gap: 7px;
+  text-transform: uppercase; letter-spacing: .5px;
+}
+.card-title svg { flex-shrink: 0; }
+
+/* ── 폼 ── */
+.form-group { margin-bottom: 14px; }
+.form-group:last-child { margin-bottom: 0; }
+label { display: block; font-size: 12px; font-weight: 600; color: var(--text-sub); margin-bottom: 5px; }
+input[type=text], input[type=date] {
+  width: 100%; padding: 10px 13px;
+  border: 1.5px solid var(--border); border-radius: var(--radius);
+  font-size: 15px; font-family: inherit;
+  background: white; color: var(--text);
+  transition: border-color .2s, box-shadow .2s;
+  -webkit-appearance: none;
+}
+input:focus { outline: none; border-color: var(--pink); box-shadow: 0 0 0 3px rgba(194,24,91,.1); }
+
+/* ── 나이 배지 ── */
+.age-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--pink-light); color: var(--pink);
+  border-radius: var(--radius); padding: 8px 13px;
+  font-size: 13px; font-weight: 600; margin-top: 10px;
+  border: 1px solid rgba(194,24,91,.2);
+  animation: fadeIn .3s ease;
+}
+@keyframes fadeIn { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:none; } }
+
+/* ── 상태 박스 ── */
+.status-box {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 12px; border-radius: var(--radius);
+  font-size: 12px; font-weight: 500; margin-bottom: 8px;
+}
+.status-success { background: var(--green-light); color: var(--green); border: 1px solid #a5d6a7; }
+.status-warn    { background: var(--amber-light);  color: var(--amber);  border: 1px solid #ffcc80; }
+.status-error   { background: var(--red-light);    color: var(--red);    border: 1px solid #ef9a9a; }
+.status-info    { background: var(--blue-light);   color: var(--blue);   border: 1px solid #90caf9; }
+
+/* ── 점수 그리드 ── */
+.score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.score-card {
+  background: var(--gray-light); border-radius: var(--radius);
+  padding: 11px 10px; text-align: center; border: 1px solid var(--border);
+}
+.score-label { font-size: 10px; color: var(--text-sub); margin-bottom: 3px; font-weight: 600; text-transform: uppercase; letter-spacing: .4px; }
+.score-val   { font-size: 26px; font-weight: 700; color: var(--text); line-height: 1; }
+.score-val small { font-size: 13px; font-weight: 500; }
+
+/* ── 섹션 구분선 ── */
+.divider {
+  display: flex; align-items: center; gap: 8px;
+  margin: 14px 0 10px; font-size: 11px; font-weight: 600;
+  color: var(--text-sub); text-transform: uppercase; letter-spacing: .5px;
+}
+.divider::before, .divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+
+/* ── 연습문항 행 ── */
+.practice-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px;
+}
+.practice-row:last-child { border-bottom: none; }
+
+/* ── 문항 행 ── */
+.item-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 0; border-bottom: 1px solid #f5f5f5;
+}
+.item-row:last-child { border-bottom: none; }
+.item-num  { font-size: 11px; color: #aaa; min-width: 24px; text-align: right; }
+.item-word { flex: 1; font-size: 14px; line-height: 1.3; }
+.item-word.bl { font-weight: 700; color: var(--pink); }
+.item-word.cl { font-weight: 700; color: var(--red); }
+
+/* ── O/X 버튼 ── */
+.btn-o, .btn-x {
+  min-width: 42px; height: 36px; padding: 0 10px;
+  border-radius: 8px; border: 1.5px solid transparent;
+  cursor: pointer; font-size: 14px; font-weight: 700;
+  transition: all .15s; font-family: inherit;
+}
+.btn-o { background: var(--green-light); color: var(--green); border-color: #a5d6a7; }
+.btn-x { background: var(--red-light);   color: var(--red);   border-color: #ef9a9a; }
+.btn-o.sel { background: var(--green); color: white; border-color: var(--green); }
+.btn-x.sel { background: var(--red);   color: white; border-color: var(--red); }
+.btn-o:active { transform: scale(.93); }
+.btn-x:active { transform: scale(.93); }
+
+/* ── 통과/실패 버튼 ── */
+.btn-pass, .btn-fail {
+  padding: 7px 14px; border-radius: 8px; border: 1.5px solid transparent;
+  cursor: pointer; font-size: 13px; font-weight: 600;
+  transition: all .15s; font-family: inherit;
+}
+.btn-pass { background: var(--green-light); color: var(--green); border-color: #a5d6a7; }
+.btn-fail { background: var(--red-light);   color: var(--red);   border-color: #ef9a9a; }
+.btn-pass.sel { background: var(--green); color: white; }
+.btn-fail.sel { background: var(--red);   color: white; }
+
+/* ── 기본 버튼 ── */
+.btn-primary {
+  width: 100%; padding: 14px;
+  background: linear-gradient(135deg, var(--pink) 0%, var(--pink-mid) 100%);
+  color: white; border: none; border-radius: var(--radius-lg);
+  font-size: 15px; font-weight: 700; cursor: pointer;
+  font-family: inherit; letter-spacing: -.2px;
+  box-shadow: 0 4px 14px rgba(194,24,91,.35);
+  transition: opacity .2s, transform .15s;
+  margin-top: 10px;
+}
+.btn-primary:active { transform: scale(.97); }
+.btn-primary:disabled { opacity: .35; cursor: not-allowed; box-shadow: none; }
+.btn-secondary {
+  width: 100%; padding: 11px;
+  background: white; color: var(--text-sub);
+  border: 1.5px solid var(--border); border-radius: var(--radius-lg);
+  font-size: 14px; font-weight: 500; cursor: pointer; font-family: inherit;
+  transition: background .15s; margin-top: 8px;
+}
+.btn-secondary:active { background: #f5f5f5; }
+
+/* ── 네비 버튼 묶음 ── */
+.nav-btns { display: flex; gap: 8px; margin-top: 12px; }
+.nav-btns .btn-primary  { flex: 1; margin-top: 0; }
+.nav-btns .btn-secondary{ flex: 0 0 80px; margin-top: 0; }
+
+/* ── 탭 ── */
+.tabs {
+  display: flex; border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 14px;
+}
+.tab {
+  flex: 1; padding: 9px 4px; font-size: 13px; font-weight: 600;
+  text-align: center; cursor: pointer; border: none;
+  background: white; color: var(--text-sub);
+  border-right: 1px solid var(--border); transition: all .2s;
+  font-family: inherit;
+}
+.tab:last-child { border-right: none; }
+.tab.active { background: var(--pink); color: white; }
+
+/* ── 결과 행 ── */
+.result-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 0; border-bottom: 1px solid #f5f5f5; font-size: 13px;
+}
+.result-row:last-child { border-bottom: none; }
+.rk { color: var(--text-sub); }
+.rv { font-weight: 700; }
+.rv.good { color: var(--green); }
+.rv.warn { color: var(--amber); }
+.rv.bad  { color: var(--red); }
+
+/* ── 바 차트 ── */
+.bar-wrap { margin: 8px 0; }
+.bar-label-row { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-sub); margin-bottom: 4px; }
+.bar-track {
+  height: 20px; background: #f0f0f0; border-radius: 10px;
+  overflow: hidden; border: 1px solid #e0e0e0;
+}
+.bar-fill {
+  height: 100%; border-radius: 10px; min-width: 36px;
+  display: flex; align-items: center; justify-content: flex-end;
+  padding-right: 8px; transition: width .7s cubic-bezier(.4,0,.2,1);
+}
+.bar-fill span { font-size: 10px; color: white; font-weight: 700; }
+
+/* ── 노트 박스 ── */
+.note {
+  font-size: 11px; line-height: 1.7; color: var(--text-sub);
+  background: var(--gray-light); border-radius: var(--radius);
+  padding: 9px 11px; margin-top: 8px; border: 1px solid var(--border);
+}
+
+/* ── 인쇄 버튼 영역 ── */
+.print-area {
+  background: white; border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg); padding: 16px; margin-bottom: 12px;
+  box-shadow: var(--shadow);
+}
+.print-area-title {
+  font-size: 12px; font-weight: 700; color: var(--text-sub);
+  text-transform: uppercase; letter-spacing: .5px;
+  margin-bottom: 10px; display: flex; align-items: center; gap: 6px;
+}
+.print-guide {
+  font-size: 11px; line-height: 1.8; color: var(--text-sub);
+  background: var(--pink-pale); border: 1px solid rgba(194,24,91,.15);
+  border-radius: var(--radius); padding: 10px 12px; margin-bottom: 12px;
+}
+.print-guide b { color: var(--pink); }
+.btn-print {
+  width: 100%; padding: 14px;
+  background: linear-gradient(135deg, #c2185b 0%, #e91e8c 100%);
+  color: white; border: none; border-radius: var(--radius-lg);
+  font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  box-shadow: 0 4px 16px rgba(194,24,91,.35); transition: opacity .2s, transform .15s;
+}
+.btn-print:active { transform: scale(.97); opacity: .9; }
+.btn-reset {
+  width: 100%; padding: 11px; margin-top: 8px;
+  background: white; color: var(--text-sub);
+  border: 1.5px solid var(--border); border-radius: var(--radius-lg);
+  font-size: 14px; font-weight: 500; cursor: pointer; font-family: inherit;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  transition: background .15s;
+}
+.btn-reset:active { background: #f5f5f5; }
+
+/* ── 유틸 ── */
+.hidden { display: none !important; }
+.mt8    { margin-top: 8px; }
+.mt12   { margin-top: 12px; }
+
+/* ── 인쇄 스타일 (별도 창) ── */
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="header-inner">
+      <div>
+        <h1>📋 REVT 검사 시스템</h1>
+        <p>수용·표현 어휘력 검사</p>
+      </div>
+      <div class="header-badge" id="headerAge">결과 자동 계산</div>
+    </div>
+  </div>
+
+  <div class="step-wrap">
+    <div class="step-bar">
+      <div class="step-seg active" id="seg0"></div>
+      <div class="step-seg" id="seg1"></div>
+      <div class="step-seg" id="seg2"></div>
+      <div class="step-seg" id="seg3"></div>
+    </div>
+    <div class="step-labels">
+      <span id="sl0">기본정보</span>
+      <span id="sl1">표현어휘</span>
+      <span id="sl2">수용어휘</span>
+      <span id="sl3">결과</span>
+    </div>
+  </div>
+
+  <div class="content" id="main"></div>
+</div>
+
+<script>
+/* ============================================================
+   문항 데이터
+============================================================ */
+const EXP = [
+  {id:1,w:"냉장고"},{id:2,w:"할아버지"},{id:3,w:"컴퓨터"},{id:4,w:"미끄럼틀"},{id:5,w:"연필"},
+  {id:6,w:"앉아있다"},{id:7,w:"이/이빨"},{id:8,w:"고추"},{id:9,w:"구름"},{id:10,w:"타다"},
+  {id:11,w:"춥다/추운"},{id:12,w:"오르다/올라가다"},{id:13,w:"싸우다"},{id:14,w:"과자"},{id:15,w:"바다"},
+  {id:16,w:"시소"},{id:17,w:"놀이터"},{id:18,w:"병아리"},{id:19,w:"칫솔"},{id:20,w:"주다"},
+  {id:21,w:"경찰"},{id:22,w:"무겁다/무거운"},{id:23,w:"네모"},{id:24,w:"넘어지다"},{id:25,w:"버섯"},
+  {id:26,w:"목욕하다"},{id:27,w:"신문"},{id:28,w:"거미줄"},{id:29,w:"따다"},{id:30,w:"자르다/베다"},
+  {id:31,w:"운전하다"},{id:32,w:"문/대문"},{id:33,w:"게"},{id:34,w:"신호등"},{id:35,w:"장난감"},
+  {id:36,w:"뚱뚱하다/뚱뚱한"},{id:37,w:"냄새맡다"},{id:38,w:"인사하다"},{id:39,w:"과일"},{id:40,w:"숫자"},
+  {id:41,w:"화내다/성내다"},{id:42,w:"주사위"},{id:43,w:"장화"},{id:44,w:"떨어지다"},{id:45,w:"소방차"},
+  {id:46,w:"뿔"},{id:47,w:"똑같다/똑같은"},{id:48,w:"북"},{id:49,w:"기어가다"},{id:50,w:"바람개비"},
+  {id:51,w:"연"},{id:52,w:"촛불"},{id:53,w:"바이올린"},{id:54,w:"택시"},{id:55,w:"잡다"},
+  {id:56,w:"뾰족하다/뾰족한"},{id:57,w:"연기"},{id:58,w:"우체국"},{id:59,w:"부러지다"},{id:60,w:"화분"},
+  {id:61,w:"스케이트"},{id:62,w:"흘리다/쏟다"},{id:63,w:"놀랍다/놀라운"},{id:64,w:"바느질하다"},{id:65,w:"낚시하다"},
+  {id:66,w:"배달하다"},{id:67,w:"누르다"},{id:68,w:"배부르다/배부른"},{id:69,w:"굴뚝"},{id:70,w:"은행잎"},
+  {id:71,w:"선인장"},{id:72,w:"폭포"},{id:73,w:"부딪치다"},{id:74,w:"백조"},{id:75,w:"단풍잎"},
+  {id:76,w:"쓰다듬다"},{id:77,w:"어부"},{id:78,w:"그릇"},{id:79,w:"바쁘다/바쁜"},{id:80,w:"전쟁"},
+  {id:81,w:"줄기"},{id:82,w:"분수대/분수"},{id:83,w:"짧다/짧은"},{id:84,w:"천장"},{id:85,w:"운동회"},
+  {id:86,w:"조종사"},{id:87,w:"낭떠러지/절벽"},{id:88,w:"공항"},{id:89,w:"무대"},{id:90,w:"이슬"},
+  {id:91,w:"마당"},{id:92,w:"우물"},{id:93,w:"인디언"},{id:94,w:"캐다"},{id:95,w:"비추다"},
+  {id:96,w:"탑"},{id:97,w:"논"},{id:98,w:"기와"},{id:99,w:"유연하다/유연한"},{id:100,w:"불편하다/불편한"},
+  {id:101,w:"뜀틀"},{id:102,w:"번지다"},{id:103,w:"간호하다"},{id:104,w:"재판하다"},{id:105,w:"날카롭다/날카로운"},
+  {id:106,w:"약수터"},{id:107,w:"오염되다"},{id:108,w:"농촌"},{id:109,w:"성장하다"},{id:110,w:"판다"},
+  {id:111,w:"일본"},{id:112,w:"나이테"},{id:113,w:"무기류/무기"},{id:114,w:"가뭄"},{id:115,w:"타원"},
+  {id:116,w:"양념"},{id:117,w:"피곤하다/피곤한"},{id:118,w:"마름모"},{id:119,w:"질기다/질긴"},{id:120,w:"꿈틀거리다"},
+  {id:121,w:"으스대다/뽐내다"},{id:122,w:"불꽃놀이"},{id:123,w:"침몰되다/침몰하다"},{id:124,w:"이끼"},{id:125,w:"구출하다/구조하다"},
+  {id:126,w:"맺히다"},{id:127,w:"행성"},{id:128,w:"찌푸리다/찡그리다"},{id:129,w:"산봉우리/봉우리"},{id:130,w:"관광객"},
+  {id:131,w:"비슷하다/비슷한"},{id:132,w:"소매"},{id:133,w:"가열하다"},{id:134,w:"호수"},{id:135,w:"추수하다"},
+  {id:136,w:"연설하다"},{id:137,w:"견인하다"},{id:138,w:"난초/난"},{id:139,w:"장례식/장례"},{id:140,w:"괴다(턱을)"},
+  {id:141,w:"안전하다/안전한"},{id:142,w:"울퉁불퉁하다/울퉁불퉁한"},{id:143,w:"평화롭다/평화로운"},{id:144,w:"경운기"},{id:145,w:"빙산"},
+  {id:146,w:"통역사/통역관"},{id:147,w:"어지럽다/어지러운"},{id:148,w:"탑승하다"},{id:149,w:"경주하다"},{id:150,w:"체포하다"},
+  {id:151,w:"공연하다"},{id:152,w:"폐수"},{id:153,w:"지피다/피우다"},{id:154,w:"매표소"},{id:155,w:"갉아먹다"},
+  {id:156,w:"성묘"},{id:157,w:"내장/장기"},{id:158,w:"어류"},{id:159,w:"화폐"},{id:160,w:"사물놀이"},
+  {id:161,w:"빗금/사선"},{id:162,w:"해조류/해초류"},{id:163,w:"단(치맛단)"},{id:164,w:"약도"},{id:165,w:"나그네"},
+  {id:166,w:"인종"},{id:167,w:"새기다"},{id:168,w:"상쾌하다/상쾌한"},{id:169,w:"휘젓다"},{id:170,w:"빚다"},
+  {id:171,w:"수상"},{id:172,w:"골절되다"},{id:173,w:"완만하다/완만한"},{id:174,w:"관측하다"},{id:175,w:"명절"},
+  {id:176,w:"지하도"},{id:177,w:"안내하다"},{id:178,w:"밀림"},{id:179,w:"궤도"},{id:180,w:"테두리"},
+  {id:181,w:"고고학자"},{id:182,w:"가파르다/가파른"},{id:183,w:"문상하다/조문하다"},{id:184,w:"모퉁이"},{id:185,w:"출렁거리다"}
+];
+const REC = [
+  {id:1,w:"바퀴"},{id:2,w:"주전자"},{id:3,w:"소"},{id:4,w:"사다리"},{id:5,w:"시끄럽다"},
+  {id:6,w:"발톱"},{id:7,w:"요리사"},{id:8,w:"바르다"},{id:9,w:"설거지하다"},{id:10,w:"접시"},
+  {id:11,w:"신다"},{id:12,w:"소방관"},{id:13,w:"뚜껑"},{id:14,w:"놀라다"},{id:15,w:"국자"},
+  {id:16,w:"혀"},{id:17,w:"넥타이"},{id:18,w:"점"},{id:19,w:"잠자리채"},{id:20,w:"당기다"},
+  {id:21,w:"연기"},{id:22,w:"찢다"},{id:23,w:"피리"},{id:24,w:"던지다"},{id:25,w:"무릎"},
+  {id:26,w:"풀"},{id:27,w:"구르다"},{id:28,w:"뱉다"},{id:29,w:"파괴하다"},{id:30,w:"윷"},
+  {id:31,w:"팔꿈치"},{id:32,w:"재다"},{id:33,w:"따르다"},{id:34,w:"삽"},{id:35,w:"기둥"},
+  {id:36,w:"채소"},{id:37,w:"따뜻하다/따뜻한"},{id:38,w:"묶다"},{id:39,w:"망원경"},{id:40,w:"격파하다"},
+  {id:41,w:"가득하다/가득한"},{id:42,w:"깎다"},{id:43,w:"농부"},{id:44,w:"곡식"},{id:45,w:"마르다/마른"},
+  {id:46,w:"실망하다/실망한"},{id:47,w:"쓰다듬다"},{id:48,w:"외투"},{id:49,w:"철봉"},{id:50,w:"궁궐"},
+  {id:51,w:"씹다"},{id:52,w:"숲"},{id:53,w:"집배원"},{id:54,w:"둥지"},{id:55,w:"겨루다"},
+  {id:56,w:"한 권"},{id:57,w:"소곤거리다"},{id:58,w:"엿보다"},{id:59,w:"환자"},{id:60,w:"심다"},
+  {id:61,w:"체온계"},{id:62,w:"만국기"},{id:63,w:"책상"},{id:64,w:"세면대"},{id:65,w:"전등불"},
+  {id:66,w:"돛"},{id:67,w:"협동하다"},{id:68,w:"위급하다/위급한"},{id:69,w:"정육점"},{id:70,w:"얼룩"},
+  {id:71,w:"탄광"},{id:72,w:"석수"},{id:73,w:"식료품"},{id:74,w:"뿌리"},{id:75,w:"확대하다"},
+  {id:76,w:"자매"},{id:77,w:"부축하다"},{id:78,w:"해안"},{id:79,w:"연장"},{id:80,w:"도표"},
+  {id:81,w:"해부하다"},{id:82,w:"굽이치다"},{id:83,w:"토론하다"},{id:84,w:"버드나무"},{id:85,w:"부화하다"},
+  {id:86,w:"설계하다"},{id:87,w:"비석"},{id:88,w:"추수하다"},{id:89,w:"한 쌍"},{id:90,w:"가축"},
+  {id:91,w:"각도기"},{id:92,w:"조명"},{id:93,w:"침몰하다"},{id:94,w:"방충망"},{id:95,w:"대여섯"},
+  {id:96,w:"늠름하다/늠름한"},{id:97,w:"철거하다"},{id:98,w:"시위하다"},{id:99,w:"기마전"},{id:100,w:"에워싸다"},
+  {id:101,w:"산만하다/산만한"},{id:102,w:"용접하다"},{id:103,w:"접종하다"},{id:104,w:"장착하다"},{id:105,w:"섬기다"},
+  {id:106,w:"겨누다"},{id:107,w:"육군"},{id:108,w:"소음"},{id:109,w:"침울하다/침울한"},{id:110,w:"폭우"},
+  {id:111,w:"후각"},{id:112,w:"모발"},{id:113,w:"사육하다"},{id:114,w:"건널목"},{id:115,w:"현상"},
+  {id:116,w:"시시덕거리다"},{id:117,w:"업신여기다"},{id:118,w:"부식되다"},{id:119,w:"산호"},{id:120,w:"땀샘"},
+  {id:121,w:"비집다"},{id:122,w:"빈궁하다/빈궁한"},{id:123,w:"야위다/야윈"},{id:124,w:"거구"},{id:125,w:"낭독하다"},
+  {id:126,w:"궤짝"},{id:127,w:"고삐"},{id:128,w:"모과"},{id:129,w:"답사하다"},{id:130,w:"타박상"},
+  {id:131,w:"우레"},{id:132,w:"관현악"},{id:133,w:"중추"},{id:134,w:"축산물"},{id:135,w:"원예"},
+  {id:136,w:"노쇠하다/노쇠한"},{id:137,w:"쌀겨"},{id:138,w:"지혈하다"},{id:139,w:"광야"},{id:140,w:"만발하다"},
+  {id:141,w:"청중"},{id:142,w:"피복선"},{id:143,w:"게슴츠레하다/게슴츠레한"},{id:144,w:"질책하다"},{id:145,w:"묘목"},
+  {id:146,w:"그을리다/그을린"},{id:147,w:"기슭"},{id:148,w:"신봉하다"},{id:149,w:"파종하다"},{id:150,w:"박멸하다"},
+  {id:151,w:"미닫이"},{id:152,w:"군의관"},{id:153,w:"굽다/구운"},{id:154,w:"강탈하다"},{id:155,w:"종사하다"},
+  {id:156,w:"가무"},{id:157,w:"번뇌하다"},{id:158,w:"매몰되다"},{id:159,w:"방적하다"},{id:160,w:"절경"},
+  {id:161,w:"영장류"},{id:162,w:"성기다/성긴"},{id:163,w:"외향적"},{id:164,w:"조정하다"},{id:165,w:"유전"},
+  {id:166,w:"사색하다"},{id:167,w:"피뢰침"},{id:168,w:"긍휼"},{id:169,w:"맹금류"},{id:170,w:"주검"},
+  {id:171,w:"검열하다"},{id:172,w:"용해시키다"},{id:173,w:"과적"},{id:174,w:"잉태하다"},{id:175,w:"상쇄하다"},
+  {id:176,w:"투항하다"},{id:177,w:"편종"},{id:178,w:"봉화"},{id:179,w:"도정하다"},{id:180,w:"반추하다"},
+  {id:181,w:"탈고하다"},{id:182,w:"산적하다"},{id:183,w:"산재하다/산재한"},{id:184,w:"다사롭다/다사로운"},{id:185,w:"독특하다/독특한"}
+];
+
+/* ============================================================
+   규준 데이터 (표-27, 28, 29)
+============================================================ */
+const NORM = {
+  "2세6-8개월":  {rec:{mean:16.95,sd:5.24},  exp:{mean:18.14,sd:8.37}},
+  "2세9-11개월": {rec:{mean:19.13,sd:6.18},  exp:{mean:22.17,sd:9.18}},
+  "3세0-5개월":  {rec:{mean:28.45,sd:8.65},  exp:{mean:33.31,sd:10.78}},
+  "3세6-11개월": {rec:{mean:32.25,sd:9.72},  exp:{mean:40.81,sd:10.46}},
+  "4세0-5개월":  {rec:{mean:42.35,sd:11.23}, exp:{mean:49.36,sd:9.54}},
+  "4세6-11개월": {rec:{mean:46.44,sd:11.57}, exp:{mean:55.40,sd:9.07}},
+  "5세0-5개월":  {rec:{mean:56.25,sd:8.96},  exp:{mean:62.72,sd:8.55}},
+  "5세6-11개월": {rec:{mean:60.11,sd:8.43},  exp:{mean:66.89,sd:7.73}},
+  "6세0-5개월":  {rec:{mean:70.13,sd:8.08},  exp:{mean:74.18,sd:7.19}},
+  "6세6-11개월": {rec:{mean:71.71,sd:8.82},  exp:{mean:75.94,sd:7.88}},
+  "7세0-5개월":  {rec:{mean:83.96,sd:7.44},  exp:{mean:85.77,sd:8.71}},
+  "7세6-11개월": {rec:{mean:86.47,sd:9.14},  exp:{mean:85.63,sd:9.15}},
+  "8세0-5개월":  {rec:{mean:90.34,sd:9.21},  exp:{mean:89.27,sd:8.20}},
+  "8세6-11개월": {rec:{mean:91.77,sd:9.87},  exp:{mean:91.23,sd:8.93}},
+  "9세0-5개월":  {rec:{mean:106.60,sd:9.94}, exp:{mean:105.69,sd:9.00}},
+  "9세6-11개월": {rec:{mean:109.34,sd:9.12}, exp:{mean:108.15,sd:10.00}},
+  "10세":        {rec:{mean:112.84,sd:8.33}, exp:{mean:111.29,sd:8.26}},
+  "11세":        {rec:{mean:129.93,sd:8.49}, exp:{mean:131.90,sd:11.67}},
+  "12세":        {rec:{mean:133.98,sd:7.90}, exp:{mean:137.49,sd:10.98}},
+  "13세":        {rec:{mean:148.38,sd:10.19},exp:{mean:149.70,sd:12.86}},
+  "14세":        {rec:{mean:150.96,sd:10.28},exp:{mean:152.61,sd:13.88}},
+  "15세":        {rec:{mean:154.24,sd:9.92}, exp:{mean:156.96,sd:11.42}},
+  "16세이상":    {rec:{mean:162.09,sd:7.74}, exp:{mean:161.28,sd:9.08}}
+};
+
+// 표-28 등가연령 (원점수 → 월령숫자 or 문자열)
+const EQ_R_MO={7:"30개월 미만",8:"30개월 미만",9:"30개월 미만",10:"30개월 미만",11:"30개월 미만",12:"30개월 미만",13:"30개월 미만",14:"30개월 미만",15:"30개월 미만",16:"30개월 미만",17:"30개월 미만",18:"30개월 미만",19:"30개월 미만",20:"30개월 미만",21:"30개월 미만",22:"30개월 미만",23:"30개월 미만",24:"30개월 미만",25:"30개월 미만",26:"30개월 미만",27:"30개월 미만",28:"30개월 미만",29:30,30:31,31:32,32:34,33:35,34:36,35:38,36:39,37:42,38:43,39:44,40:46,41:47,42:48,43:50,44:51,45:52,46:54,47:55,48:56,49:58,50:59,51:60,52:62,53:63,54:64,55:66,56:67,57:68,58:70,59:71,60:72,61:74,62:75,63:76,64:77,65:79,66:80,67:81,68:83,69:84,70:85,71:87,72:88,73:89,74:91,75:92,76:93,77:95,78:96,79:97,80:99,81:100,82:101,83:103,84:104,85:105,86:107,87:108,88:109,89:111,90:112,91:113,92:115,93:116,94:117,95:118,96:120,97:121,98:122,99:124,100:125,101:126,102:128,103:129,104:130,105:132,106:133,107:134,108:136,109:137,110:138,111:140,112:141,113:142,114:144,115:145,116:146,117:148,118:149,119:150,120:152,121:153,122:154,123:156,124:157,125:158,126:160,127:161,128:162,129:163,130:165,131:166,132:167,133:169,134:170,135:171,136:173,137:174,138:175,139:177,140:178,141:179,142:181,143:182,144:183,145:185,146:186,147:187,148:189,149:190,150:191,151:193,152:193,153:"193개월 이상",154:"193개월 이상",155:"193개월 이상"};
+const EQ_R_ST={7:"2세6개월 미만",8:"2세6개월 미만",9:"2세6개월 미만",10:"2세6개월 미만",11:"2세6개월 미만",12:"2세6개월 미만",13:"2세6개월 미만",14:"2세6개월 미만",15:"2세6개월 미만",16:"2세6개월 미만",17:"2세6개월 미만",18:"2세6개월 미만",19:"2세6개월 미만",20:"2세6개월 미만",21:"2세6개월 미만",22:"2세6개월 미만",23:"2세6개월 미만",24:"2세6개월 미만",25:"2세6개월 미만",26:"2세6개월 미만",27:"2세6개월 미만",28:"2세6개월 미만",29:"2세6-8개월",30:"2세6-8개월",31:"2세6-8개월",32:"2세9-11개월",33:"2세9-11개월",34:"3세0-5개월",35:"3세0-5개월",36:"3세0-5개월",37:"3세6-11개월",38:"3세6-11개월",39:"3세6-11개월",40:"3세6-11개월",41:"3세6-11개월",42:"4세0-5개월",43:"4세0-5개월",44:"4세0-5개월",45:"4세0-5개월",46:"4세6-11개월",47:"4세6-11개월",48:"4세6-11개월",49:"4세6-11개월",50:"4세6-11개월",51:"5세0-5개월",52:"5세0-5개월",53:"5세0-5개월",54:"5세0-5개월",55:"5세0-5개월",56:"5세6-11개월",57:"5세6-11개월",58:"5세6-11개월",59:"5세6-11개월",60:"5세6-11개월",61:"6세0-5개월",62:"6세0-5개월",63:"6세0-5개월",64:"6세0-5개월",65:"6세0-5개월",66:"6세6-11개월",67:"6세6-11개월",68:"6세6-11개월",69:"6세6-11개월",70:"7세0-5개월",71:"7세0-5개월",72:"7세0-5개월",73:"7세0-5개월",74:"7세0-5개월",75:"7세6-11개월",76:"7세6-11개월",77:"7세6-11개월",78:"7세6-11개월",79:"8세0-5개월",80:"8세0-5개월",81:"8세0-5개월",82:"8세0-5개월",83:"8세0-5개월",84:"8세6-11개월",85:"8세6-11개월",86:"8세6-11개월",87:"8세6-11개월",88:"9세0-5개월",89:"9세0-5개월",90:"9세0-5개월",91:"9세0-5개월",92:"9세0-5개월",93:"9세6-11개월",94:"9세6-11개월",95:"9세6-11개월",96:"9세6-11개월",97:"10세",98:"10세",99:"10세",100:"10세",101:"10세",102:"10세",103:"10세",104:"10세",105:"10세",106:"11세",107:"11세",108:"11세",109:"11세",110:"11세",111:"11세",112:"11세",113:"11세",114:"11세",115:"12세",116:"12세",117:"12세",118:"12세",119:"12세",120:"12세",121:"12세",122:"12세",123:"12세",124:"13세",125:"13세",126:"13세",127:"13세",128:"13세",129:"13세",130:"13세",131:"13세",132:"13세",133:"13세",134:"14세",135:"14세",136:"14세",137:"14세",138:"14세",139:"14세",140:"14세",141:"14세",142:"14세",143:"15세",144:"15세",145:"15세",146:"15세",147:"15세",148:"15세",149:"15세",150:"15세",151:"15세",152:"16세 이상",153:"16세 이상",154:"16세 이상",155:"16세 이상"};
+const EQ_E_MO={7:"30개월 미만",8:"30개월 미만",9:"30개월 미만",10:"30개월 미만",11:"30개월 미만",12:"30개월 미만",13:"30개월 미만",14:"30개월 미만",15:"30개월 미만",16:"30개월 미만",17:"30개월 미만",18:"30개월 미만",19:"30개월 미만",20:"30개월 미만",21:"30개월 미만",22:"30개월 미만",23:"30개월 미만",24:"30개월 미만",25:"30개월 미만",26:"30개월 미만",27:"30개월 미만",28:"30개월 미만",29:"30개월 미만",30:"30개월 미만",31:"30개월 미만",32:"30개월 미만",33:"30개월 미만",34:30,35:31,36:33,37:34,38:35,39:37,40:38,41:39,42:41,43:42,44:43,45:45,46:46,47:48,48:49,49:50,50:52,51:53,52:54,53:56,54:57,55:58,56:60,57:61,58:63,59:64,60:65,61:67,62:68,63:69,64:71,65:72,66:74,67:75,68:76,69:78,70:79,71:80,72:82,73:83,74:84,75:86,76:87,77:89,78:90,79:91,80:93,81:94,82:95,83:97,84:98,85:99,86:101,87:102,88:104,89:105,90:106,91:108,92:109,93:110,94:112,95:113,96:114,97:116,98:117,99:119,100:120,101:121,102:123,103:124,104:125,105:127,106:128,107:130,108:131,109:132,110:134,111:135,112:136,113:138,114:139,115:140,116:142,117:143,118:145,119:146,120:147,121:149,122:150,123:151,124:153,125:154,126:155,127:157,128:158,129:160,130:161,131:162,132:164,133:165,134:166,135:168,136:169,137:171,138:172,139:173,140:175,141:176,142:177,143:179,144:180,145:181,146:183,147:184,148:186,149:187,150:188,151:190,152:191,153:"192개월 이상",154:"192개월 이상",155:"192개월 이상"};
+const EQ_E_ST={7:"2세6개월 미만",8:"2세6개월 미만",9:"2세6개월 미만",10:"2세6개월 미만",11:"2세6개월 미만",12:"2세6개월 미만",13:"2세6개월 미만",14:"2세6개월 미만",15:"2세6개월 미만",16:"2세6개월 미만",17:"2세6개월 미만",18:"2세6개월 미만",19:"2세6개월 미만",20:"2세6개월 미만",21:"2세6개월 미만",22:"2세6개월 미만",23:"2세6개월 미만",24:"2세6개월 미만",25:"2세6개월 미만",26:"2세6개월 미만",27:"2세6개월 미만",28:"2세6개월 미만",29:"2세6개월 미만",30:"2세6개월 미만",31:"2세6개월 미만",32:"2세6개월 미만",33:"2세6개월 미만",34:"2세6-8개월",35:"2세6-8개월",36:"2세9-11개월",37:"2세9-11개월",38:"3세0-5개월",39:"3세0-5개월",40:"3세0-5개월",41:"3세0-5개월",42:"3세0-5개월",43:"3세6-11개월",44:"3세6-11개월",45:"3세6-11개월",46:"4세0-5개월",47:"4세0-5개월",48:"4세0-5개월",49:"4세0-5개월",50:"4세0-5개월",51:"4세0-5개월",52:"4세0-5개월",53:"4세0-5개월",54:"4세6-11개월",55:"4세6-11개월",56:"5세0-5개월",57:"5세0-5개월",58:"4세6-11개월",59:"4세6-11개월",60:"5세0-5개월",61:"5세0-5개월",62:"5세0-5개월",63:"5세0-5개월",64:"5세0-5개월",65:"5세6-11개월",66:"5세6-11개월",67:"5세6-11개월",68:"5세6-11개월",69:"5세6-11개월",70:"6세0-5개월",71:"6세0-5개월",72:"6세0-5개월",73:"6세0-5개월",74:"6세0-5개월",75:"6세6-11개월",76:"6세0-5개월",77:"6세0-5개월",78:"6세6-11개월",79:"6세6-11개월",80:"6세6-11개월",81:"7세0-5개월",82:"6세6-11개월",83:"6세6-11개월",84:"7세0-5개월",85:"7세0-5개월",86:"7세0-5개월",87:"7세0-5개월",88:"7세0-5개월",89:"7세0-5개월",90:"7세6-11개월",91:"7세6-11개월",92:"7세6-11개월",93:"7세6-11개월",94:"7세6-11개월",95:"7세6-11개월",96:"7세6-11개월",97:"7세6-11개월",98:"7세6-11개월",99:"7세6-11개월",100:"10세",101:"10세",102:"10세",103:"10세",104:"10세",105:"10세",106:"10세",107:"10세",108:"10세",109:"11세",110:"11세",111:"11세",112:"11세",113:"11세",114:"11세",115:"11세",116:"11세",117:"11세",118:"11세",119:"12세",120:"12세",121:"12세",122:"12세",123:"12세",124:"12세",125:"12세",126:"12세",127:"13세",128:"13세",129:"13세",130:"13세",131:"13세",132:"13세",133:"13세",134:"13세",135:"14세",136:"14세",137:"14세",138:"14세",139:"14세",140:"14세",141:"14세",142:"14세",143:"14세",144:"15세",145:"15세",146:"15세",147:"15세",148:"15세",149:"15세",150:"15세",151:"15세",152:"16세 이상",153:"16세 이상",154:"16세 이상",155:"16세 이상"};
+
+const PCT = {
+  "2세6-8개월": {rec:[10,13,14,16,17,18,19,22,24,30],exp:[7,10,13,16,18,20,22,25,30,41]},
+  "2세9-11개월":{rec:[12,14,17,17,19,21,22,25,27,33],exp:[9,16,19,21,22,23,25,32,34,42]},
+  "3세0-5개월": {rec:[18,22,24,27,29,30,33,36,39,56],exp:[18,24,28,31,34,36,39,43,48,57]},
+  "3세6-11개월":{rec:[19,24,27,30,34,36,38,41,44,53],exp:[26,33,36,39,42,45,48,51,53,59]},
+  "4세0-5개월": {rec:[29,34,38,41,44,47,49,51,55,62],exp:[36,42,45,48,50,53,55,57,61,73]},
+  "4세6-11개월":{rec:[32,38,42,45,47,51,54,57,59,64],exp:[43,48,52,55,57,58,61,63,66,75]},
+  "5세0-5개월": {rec:[44,49,51,54,57,59,61,63,67,74],exp:[50,56,59,62,64,66,67,70,73,82]},
+  "5세6-11개월":{rec:[50,55,57,59,61,63,64,66,69,78],exp:[56,62,64,66,68,69,72,74,76,84]},
+  "6세0-5개월": {rec:[60,64,66,69,70,72,74,77,79,97],exp:[65,68,71,73,75,77,78,81,83,91]},
+  "6세6-11개월":{rec:[61,64,68,70,71,74,76,78,82,97],exp:[64,70,73,76,78,79,81,83,86,90]},
+  "7세0-5개월": {rec:[74,77,81,83,85,87,88,90,95,100],exp:[74,77,82,84,86,88,91,93,96,101]},
+  "7세6-11개월":{rec:[75,80,82,84,87,88,90,94,100,111],exp:[73,76,81,83,85,88,91,93,98,105]},
+  "8세0-5개월": {rec:[79,84,86,88,91,93,95,99,104,112],exp:[77,82,84,88,90,92,94,96,99,106]},
+  "8세6-11개월":{rec:[80,84,86,89,92,95,99,103,105,111],exp:[78,82,87,90,93,94,97,99,101,106]},
+  "9세0-5개월": {rec:[94,98,102,104,107,110,113,117,120,126],exp:[94,99,102,104,106,108,111,114,116,123]},
+  "9세6-11개월":{rec:[97,101,105,107,111,113,115,118,122,127],exp:[94,99,103,106,109,111,115,116,122,127]},
+  "10세":       {rec:[102,105,109,112,114,116,118,120,123,129],exp:[99,104,108,110,112,114,116,119,121,127]},
+  "11세":       {rec:[119,123,126,128,131,133,135,137,142,152],exp:[116,122,126,130,133,136,137,140,145,160]},
+  "12세":       {rec:[123,127,129,132,135,137,139,141,145,150],exp:[121,127,132,135,138,141,144,147,151,161]},
+  "13세":       {rec:[136,140,143,146,149,152,154,157,161,173],exp:[133,139,143,147,151,154,158,162,166,177]},
+  "14세":       {rec:[137,142,146,149,151,154,156,159,165,171],exp:[133,141,145,151,153,158,160,165,171,181]},
+  "15세":       {rec:[142,147,149,152,154,158,160,163,166,172],exp:[142,149,153,156,158,160,162,166,171,181]},
+  "16세이상":   {rec:[151,155,159,161,163,165,167,169,171,175],exp:[150,154,157,160,162,164,167,170,174,176]}
+};
+const PCT_LV = [10,20,30,40,50,60,70,80,90,100];
+
+/* ============================================================
+   상태
+============================================================ */
+let S = {
+  step:0, name:'', testDate:'', birthDate:'',
+  y:0, m:0, tm:0, grp:'',
+  prac:{A:null,B:null,C:null,D:null,E:null},
+  eI:{}, eStart:1, eBL:null, eCL:null, eScore:0,
+  rI:{}, rStart:1, rBL:null, rCL:null, rScore:0
+};
+
+/* ============================================================
+   헬퍼
+============================================================ */
+function age(b,t){
+  const bd=new Date(b),td=new Date(t);
+  let y=td.getFullYear()-bd.getFullYear(), m=td.getMonth()-bd.getMonth();
+  if(td.getDate()<bd.getDate()) m--;
+  if(m<0){m+=12;y--;}
+  return {y,m,tm:y*12+m};
+}
+function grp(y,m){
+  if(y<2||(y===2&&m<6)) return"2세6-8개월";
+  if(y===2&&m<=8) return"2세6-8개월";
+  if(y===2) return"2세9-11개월";
+  if(y===3&&m<=5) return"3세0-5개월";
+  if(y===3) return"3세6-11개월";
+  if(y===4&&m<=5) return"4세0-5개월";
+  if(y===4) return"4세6-11개월";
+  if(y===5&&m<=5) return"5세0-5개월";
+  if(y===5) return"5세6-11개월";
+  if(y===6&&m<=5) return"6세0-5개월";
+  if(y===6) return"6세6-11개월";
+  if(y===7&&m<=5) return"7세0-5개월";
+  if(y===7) return"7세6-11개월";
+  if(y===8&&m<=5) return"8세0-5개월";
+  if(y===8) return"8세6-11개월";
+  if(y===9&&m<=5) return"9세0-5개월";
+  if(y===9) return"9세6-11개월";
+  if(y===10) return"10세";
+  if(y===11) return"11세";
+  if(y===12) return"12세";
+  if(y===13) return"13세";
+  if(y===14) return"14세";
+  if(y===15) return"15세";
+  return"16세이상";
+}
+function eStart(y){ return y<5?1:y<7?16:y<10?46:y<13?91:121; }
+function baseline(items,start){
+  let c=0,f=null;
+  for(let i=start;i<=185;i++){
+    if(items[i]===true){c++;if(c>=8&&!f)f=i-7;}
+    else if(items[i]===false) c=0;
+    else break;
+  }
+  return f;
+}
+function ceiling(items,start){
+  let w=[];
+  for(let i=start;i<=185;i++){
+    if(items[i]!==undefined){
+      w.push({id:i,p:items[i]});
+      if(w.length>8) w.shift();
+      if(w.length===8&&w.filter(x=>!x.p).length>=6) return w[w.length-1].id;
+    }
+  }
+  return null;
+}
+function rawScore(items,bl,cl){
+  if(!bl) return 0;
+  const end=cl||185;
+  let wrong=0;
+  for(let i=bl;i<=end;i++) if(items[i]===false) wrong++;
+  return end-wrong;
+}
+// 백분위 구간 반환: {label:'10%ile 미만', val:5, barPct:5}
+function getPct(score,g,type){
+  const n=PCT[g]; if(!n) return{label:'정보없음',val:0,barPct:0};
+  const a=type==='rec'?n.rec:n.exp;
+  // 10%ile 기준 점수보다 낮으면
+  if(score < a[0]) return{label:'10%ile 미만',val:5,barPct:5};
+  for(let i=0;i<a.length;i++){
+    if(score === a[i]) return{label:`${PCT_LV[i]}%ile`,val:PCT_LV[i],barPct:PCT_LV[i]};
+    if(i>0 && score > a[i-1] && score < a[i]){
+      const lo=PCT_LV[i-1], hi=PCT_LV[i];
+      return{label:`${lo}~${hi}%ile 사이`,val:lo+5,barPct:lo+5};
+    }
+  }
+  // 100%ile 기준점과 같거나 초과
+  if(score >= a[a.length-1]) return{label:'100%ile',val:100,barPct:100};
+  return{label:'정보없음',val:0,barPct:0};
+}
+function getSD(score,g,type){
+  const n=NORM[g]; if(!n) return{l:'정보없음',lv:0};
+  const d=type==='rec'?n.rec:n.exp;
+  const diff=score-d.mean;
+  if(diff>=-d.sd)       return{l:'정상범주',lv:1};
+  if(diff>=-2*d.sd)     return{l:'-1SD 이하',lv:-1};
+  return{l:'-2SD 이하',lv:-2};
+}
+function moStr(v){
+  if(typeof v==='string') return v;   // "30개월 미만" 등 문자열 그대로
+  return `${v}개월`;                   // 숫자면 "130개월" 형태
+}
+function getEq(score,type){
+  const c=Math.max(7,Math.min(155,score));
+  return type==='rec'
+    ?{mo:moStr(EQ_R_MO[c]),st:EQ_R_ST[c]||''}
+    :{mo:moStr(EQ_E_MO[c]),st:EQ_E_ST[c]||''};
+}
+function sdCls(lv){ return lv===1?'good':lv===-1?'warn':'bad'; }
+// pct는 이제 객체 {label, val, barPct} → val 기준으로 색상/클래스 결정
+function pctCls(p){ return p>=25?'good':p>=10?'warn':'bad'; }
+function pctColor(p){ return p>=25?'var(--green)':p>=10?'var(--amber)':'var(--red)'; }
+function sdColor(lv){ return lv===1?'var(--green)':lv===-1?'var(--amber)':'var(--red)'; }
+
+/* ============================================================
+   렌더
+============================================================ */
+function render(){
+  updateStepBar();
+  const m=document.getElementById('main');
+  if(S.step===0) m.innerHTML=step0();
+  else if(S.step===1) m.innerHTML=step1();
+  else if(S.step===2) m.innerHTML=step2();
+  else m.innerHTML=step3();
+  bind();
+}
+
+function updateStepBar(){
+  ['0','1','2','3'].forEach((i)=>{
+    const s=document.getElementById('seg'+i);
+    const l=document.getElementById('sl'+i);
+    s.className='step-seg'+(+i===S.step?' active':+i<S.step?' done':'');
+    if(l) l.className=(+i===S.step?'cur':'');
+  });
+  const h=document.getElementById('headerAge');
+  if(S.tm>0) h.textContent=`만 ${S.y}세 ${S.m}개월`;
+  else h.textContent='결과 자동 계산';
+}
+
+/* ── Step 0: 기본정보 ── */
+function step0(){
+  return `
+  <div class="card">
+    <div class="card-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      아동 기본 정보
+    </div>
+    <div class="form-group">
+      <label>아동 이름</label>
+      <input type="text" id="iName" value="${S.name}" placeholder="이름 입력">
+    </div>
+    <div class="form-group">
+      <label>평가일</label>
+      <input type="date" id="iTest" value="${S.testDate}">
+    </div>
+    <div class="form-group">
+      <label>생년월일</label>
+      <input type="date" id="iBirth" value="${S.birthDate}">
+    </div>
+    <div id="ageBadge">${S.tm?`<div class="age-badge">📅 만 ${S.y}세 ${S.m}개월 (${S.tm}개월) · ${S.grp}</div>`:''}</div>
+  </div>
+  <button class="btn-primary" id="btnNext0" onclick="go1()" ${(!S.name||!S.testDate||!S.birthDate)?'disabled':''}>
+    다음 &mdash; 표현어휘 검사 →
+  </button>`;
+}
+
+/* ── Step 1: 표현어휘 ── */
+function step1(){
+  const bl=S.eBL, cl=S.eCL, sc=rawScore(S.eI,bl,cl);
+  let h=`
+  <div class="card">
+    <div class="card-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      표현어휘력 검사
+      <span style="margin-left:auto;background:var(--pink-light);color:var(--pink);border-radius:12px;padding:2px 9px;font-size:11px;font-weight:700">시작: ${S.eStart}번</span>
+    </div>`;
+  if(bl) h+=`<div class="status-box status-success">✅ 기초선 확립: ${bl}번 문항</div>`;
+  if(cl) h+=`<div class="status-box status-error">🔴 최고한계선: ${cl}번 문항</div>`;
+  if(!bl&&Object.keys(S.eI).length>0) h+=`<div class="status-box status-warn">⚠️ 기초선 미확립 — 앞 문항을 더 실시하세요</div>`;
+  if(bl) h+=`<div class="score-grid">
+    <div class="score-card"><div class="score-label">현재 원점수</div><div class="score-val">${sc}</div></div>
+    <div class="score-card"><div class="score-label">실시 문항</div><div class="score-val">${Object.keys(S.eI).length}<small>문항</small></div></div>
+  </div>`;
+  // 연습문항
+  const keys=S.y<6?['A','B','C']:['D','E'];
+  h+=`<div class="divider">연습문항 (${S.y<6?'6세 미만: A·B·C':'6세 이상: D·E'})</div>`;
+  keys.forEach(k=>{
+    h+=`<div class="practice-row"><span style="font-weight:500">연습 ${k}</span>
+    <div style="display:flex;gap:6px">
+      <button class="btn-pass${S.prac[k]===true?' sel':''}" onclick="setPrac('${k}',true)">통과</button>
+      <button class="btn-fail${S.prac[k]===false?' sel':''}" onclick="setPrac('${k}',false)">실패</button>
+    </div></div>`;
+  });
+  // 본문항
+  h+=`<div class="divider">본문항</div>`;
+  const end=cl||185;
+  EXP.slice(S.eStart-1,end).forEach(item=>{
+    const v=S.eI[item.id];
+    const isBL=bl===item.id, isCL=cl===item.id;
+    h+=`<div class="item-row">
+      <span class="item-num">${item.id}</span>
+      <span class="item-word${isBL?' bl':isCL?' cl':''}">${item.w}${isBL?' 🔵':isCL?' 🔴':''}</span>
+      <button class="btn-o${v===true?' sel':''}" onclick="setE(${item.id},true)">O</button>
+      <button class="btn-x${v===false?' sel':''}" onclick="setE(${item.id},false)">X</button>
+    </div>`;
+  });
+  h+=`</div>
+  <div class="nav-btns">
+    <button class="btn-secondary" onclick="go(0)">← 이전</button>
+    <button class="btn-primary" onclick="go2()">수용어휘 검사 →</button>
+  </div>`;
+  return h;
+}
+
+/* ── Step 2: 수용어휘 ── */
+function step2(){
+  const bl=S.rBL, cl=S.rCL, sc=rawScore(S.rI,bl,cl);
+  let h=`
+  <div class="card">
+    <div class="card-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      수용어휘력 검사
+      <span style="margin-left:auto;background:var(--blue-light);color:var(--blue);border-radius:12px;padding:2px 9px;font-size:11px;font-weight:700">시작: ${S.rStart}번</span>
+    </div>
+    <div class="note">📌 표현어휘 기초선(<b>${S.eBL||1}번</b>)부터 수용 검사 시작</div>`;
+  if(bl) h+=`<div class="status-box status-success mt8">✅ 기초선 확립: ${bl}번 문항</div>`;
+  if(cl) h+=`<div class="status-box status-error">🔴 최고한계선: ${cl}번 문항</div>`;
+  if(bl) h+=`<div class="score-grid mt8">
+    <div class="score-card"><div class="score-label">현재 원점수</div><div class="score-val">${sc}</div></div>
+    <div class="score-card"><div class="score-label">실시 문항</div><div class="score-val">${Object.keys(S.rI).length}<small>문항</small></div></div>
+  </div>`;
+  h+=`<div class="divider">본문항</div>`;
+  const end=cl||185;
+  REC.slice(S.rStart-1,end).forEach(item=>{
+    const v=S.rI[item.id];
+    const isBL=bl===item.id, isCL=cl===item.id;
+    h+=`<div class="item-row">
+      <span class="item-num">${item.id}</span>
+      <span class="item-word${isBL?' bl':isCL?' cl':''}">${item.w}${isBL?' 🔵':isCL?' 🔴':''}</span>
+      <button class="btn-o${v===true?' sel':''}" onclick="setR(${item.id},true)">O</button>
+      <button class="btn-x${v===false?' sel':''}" onclick="setR(${item.id},false)">X</button>
+    </div>`;
+  });
+  h+=`</div>
+  <div class="nav-btns">
+    <button class="btn-secondary" onclick="go(1)">← 이전</button>
+    <button class="btn-primary" onclick="go3()">결과 보기 →</button>
+  </div>`;
+  return h;
+}
+
+/* ── Step 3: 결과 ── */
+function step3(){
+  const es=S.eScore, rs=S.rScore, g=S.grp;
+  const eEq=getEq(es,'exp'), rEq=getEq(rs,'rec');
+  const eP=getPct(es,g,'exp'), rP=getPct(rs,g,'rec');   // 객체 {label, val, barPct}
+  const eSD=getSD(es,g,'exp'), rSD=getSD(rs,g,'rec');
+  const nm=NORM[g];
+  const eWrong=Object.values(S.eI).filter(v=>v===false).length;
+  const rWrong=Object.values(S.rI).filter(v=>v===false).length;
+
+  return `
+  <div class="card">
+    <div class="card-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      검사 결과 요약
+    </div>
+    <div style="font-size:12px;color:var(--text-sub);margin-bottom:14px">
+      ${S.name} · 만 ${S.y}세 ${S.m}개월 · ${S.testDate} · ${g}
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" id="t-e" onclick="tab('e')">표현어휘</button>
+      <button class="tab" id="t-r" onclick="tab('r')">수용어휘</button>
+      <button class="tab" id="t-b" onclick="tab('b')">비교</button>
+    </div>
+
+    <!-- 표현 탭 -->
+    <div id="tc-e">
+      <div class="score-grid">
+        <div class="score-card"><div class="score-label">원점수</div><div class="score-val" style="color:var(--pink)">${es}</div></div>
+        <div class="score-card"><div class="score-label">백분위</div><div class="score-val" style="color:${pctColor(eP.val)};font-size:${eP.label.length>6?'14px':'26px'}">${eP.label}</div></div>
+      </div>
+      <div class="result-row"><span class="rk">등가월령</span><span class="rv">${eEq.mo}</span></div>
+      <div class="result-row"><span class="rk">등가연령</span><span class="rv">${eEq.st}</span></div>
+      <div class="result-row"><span class="rk">SD 판정</span><span class="rv ${sdCls(eSD.lv)}">${eSD.l}</span></div>
+      ${nm?`
+      <div class="result-row"><span class="rk">연령 평균 (SD)</span><span class="rv">${nm.exp.mean} ± ${nm.exp.sd}</span></div>
+      <div class="result-row"><span class="rk">-1SD 기준</span><span class="rv warn">${(nm.exp.mean-nm.exp.sd).toFixed(2)}</span></div>
+      <div class="result-row"><span class="rk">-2SD 기준</span><span class="rv bad">${(nm.exp.mean-2*nm.exp.sd).toFixed(2)}</span></div>`:''}
+      <div class="bar-wrap" style="margin-top:10px">
+        <div class="bar-label-row"><span>백분위 위치</span><span>${eP.label}</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:${eP.barPct}%;background:${sdColor(eSD.lv)}"><span>${eP.label}</span></div></div>
+      </div>
+    </div>
+
+    <!-- 수용 탭 -->
+    <div id="tc-r" class="hidden">
+      <div class="score-grid">
+        <div class="score-card"><div class="score-label">원점수</div><div class="score-val" style="color:var(--blue)">${rs}</div></div>
+        <div class="score-card"><div class="score-label">백분위</div><div class="score-val" style="color:${pctColor(rP.val)};font-size:${rP.label.length>6?'14px':'26px'}">${rP.label}</div></div>
+      </div>
+      <div class="result-row"><span class="rk">등가월령</span><span class="rv">${rEq.mo}</span></div>
+      <div class="result-row"><span class="rk">등가연령</span><span class="rv">${rEq.st}</span></div>
+      <div class="result-row"><span class="rk">SD 판정</span><span class="rv ${sdCls(rSD.lv)}">${rSD.l}</span></div>
+      ${nm?`
+      <div class="result-row"><span class="rk">연령 평균 (SD)</span><span class="rv">${nm.rec.mean} ± ${nm.rec.sd}</span></div>
+      <div class="result-row"><span class="rk">-1SD 기준</span><span class="rv warn">${(nm.rec.mean-nm.rec.sd).toFixed(2)}</span></div>
+      <div class="result-row"><span class="rk">-2SD 기준</span><span class="rv bad">${(nm.rec.mean-2*nm.rec.sd).toFixed(2)}</span></div>`:''}
+      <div class="bar-wrap" style="margin-top:10px">
+        <div class="bar-label-row"><span>백분위 위치</span><span>${rP.label}</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:${rP.barPct}%;background:${sdColor(rSD.lv)}"><span>${rP.label}</span></div></div>
+      </div>
+    </div>
+
+    <!-- 비교 탭 -->
+    <div id="tc-b" class="hidden">
+      <div class="result-row">
+        <span class="rk">구분</span>
+        <span style="font-size:12px"><span style="color:var(--pink);font-weight:700">표현</span> / <span style="color:var(--blue);font-weight:700">수용</span></span>
+      </div>
+      <div class="result-row"><span class="rk">원점수</span><span><span style="color:var(--pink);font-weight:700">${es}점</span> / <span style="color:var(--blue);font-weight:700">${rs}점</span></span></div>
+      <div class="result-row"><span class="rk">등가월령</span><span style="font-size:12px"><span style="color:var(--pink)">${eEq.mo}</span> / <span style="color:var(--blue)">${rEq.mo}</span></span></div>
+      <div class="result-row"><span class="rk">등가연령</span><span style="font-size:12px"><span style="color:var(--pink)">${eEq.st}</span> / <span style="color:var(--blue)">${rEq.st}</span></span></div>
+      <div class="result-row"><span class="rk">백분위</span><span style="font-size:12px"><span class="rv ${pctCls(eP.val)}">${eP.label}</span> / <span class="rv ${pctCls(rP.val)}">${rP.label}</span></span></div>
+      <div class="result-row"><span class="rk">SD 판정</span><span style="font-size:12px"><span class="rv ${sdCls(eSD.lv)}">${eSD.l}</span> / <span class="rv ${sdCls(rSD.lv)}">${rSD.l}</span></span></div>
+      <div class="bar-wrap" style="margin-top:12px">
+        <div class="bar-label-row"><span style="color:var(--pink);font-weight:600">표현어휘</span><span>${eP.label}</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:${eP.barPct}%;background:var(--pink)"><span>${eP.label}</span></div></div>
+      </div>
+      <div class="bar-wrap" style="margin-top:8px">
+        <div class="bar-label-row"><span style="color:var(--blue);font-weight:600">수용어휘</span><span>${rP.label}</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:${rP.barPct}%;background:var(--blue)"><span>${rP.label}</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 인쇄/PDF 영역 -->
+  <div class="print-area">
+    <div class="print-area-title">
+      🖨️ 결과지 저장 / 공유
+    </div>
+    <div class="print-guide">
+      <b>📱 아이폰·아이패드</b> : 인쇄 버튼 → 미리보기 화면에서 핀치아웃 → 공유 → PDF 저장 → 카카오톡·메일로 공유<br>
+      <b>📱 안드로이드</b> : 인쇄 버튼 → PDF로 저장 선택<br>
+      <b>💻 PC</b> : 인쇄 버튼 → 프린터를 <b>PDF로</b> 선택
+    </div>
+    <button class="btn-print" onclick="doPrint()">
+      🖨️ 인쇄 / PDF 저장
+    </button>
+    <button class="btn-reset" onclick="resetAll()">
+      🔄 새 검사 시작
+    </button>
+  </div>
+  <button class="btn-secondary" onclick="go(2)">← 이전으로</button>
+  `;
+}
+
+/* ============================================================
+   이벤트 바인딩
+============================================================ */
+function bind(){
+  const n=document.getElementById('iName');
+  const t=document.getElementById('iTest');
+  const b=document.getElementById('iBirth');
+  if(n) n.addEventListener('input', e=>{S.name=e.target.value; updBtn0();});
+  if(t) t.addEventListener('change',e=>{S.testDate=e.target.value; updAge();});
+  if(b) b.addEventListener('change',e=>{S.birthDate=e.target.value; updAge();});
+}
+function updBtn0(){
+  const btn=document.getElementById('btnNext0');
+  if(btn) btn.disabled=!S.name||!S.testDate||!S.birthDate;
+}
+function updAge(){
+  if(S.testDate&&S.birthDate){
+    const a=age(S.birthDate,S.testDate);
+    S.y=a.y; S.m=a.m; S.tm=a.tm;
+    S.grp=grp(a.y,a.m);
+    const el=document.getElementById('ageBadge');
+    if(el) el.innerHTML=`<div class="age-badge">📅 만 ${a.y}세 ${a.m}개월 (${a.tm}개월) · ${S.grp}</div>`;
+    updateStepBar();
+  }
+  updBtn0();
+}
+
+/* ── 네비 ── */
+function go(n){ S.step=n; render(); window.scrollTo(0,0); }
+function go1(){ S.eStart=eStart(S.y); S.step=1; render(); window.scrollTo(0,0); }
+function go2(){ S.eScore=rawScore(S.eI,S.eBL,S.eCL); S.rStart=S.eBL||1; S.step=2; render(); window.scrollTo(0,0); }
+function go3(){ S.rScore=rawScore(S.rI,S.rBL,S.rCL); S.step=3; render(); window.scrollTo(0,0); }
+
+/* ── 문항 체크 ── */
+function setPrac(k,v){ S.prac[k]=v; render(); }
+function setE(id,val){
+  S.eI[id]=val;
+  S.eBL=baseline(S.eI,S.eStart);
+  S.eCL=ceiling(S.eI,S.eStart);
+  render();
+  scrollToItem(`setE(${id},${val})`);
+}
+function setR(id,val){
+  S.rI[id]=val;
+  S.rBL=baseline(S.rI,S.rStart);
+  S.rCL=ceiling(S.rI,S.rStart);
+  render();
+  scrollToItem(`setR(${id},${val})`);
+}
+function scrollToItem(attr){
+  setTimeout(()=>{
+    const el=document.querySelector(`[onclick="${attr}"]`);
+    if(el) el.scrollIntoView({block:'nearest',behavior:'smooth'});
+  },50);
+}
+
+/* ── 탭 전환 ── */
+function tab(t){
+  ['e','r','b'].forEach(x=>{
+    document.getElementById('t-'+x).className='tab'+(x===t?' active':'');
+    document.getElementById('tc-'+x).className=(x===t?'':'hidden');
+  });
+}
+
+/* ── 리셋 ── */
+function resetAll(){
+  S={step:0,name:'',testDate:'',birthDate:'',y:0,m:0,tm:0,grp:'',
+     prac:{A:null,B:null,C:null,D:null,E:null},
+     eI:{},eStart:1,eBL:null,eCL:null,eScore:0,
+     rI:{},rStart:1,rBL:null,rCL:null,rScore:0};
+  render(); window.scrollTo(0,0);
+}
+
+/* ============================================================
+   인쇄 결과지 HTML 생성
+============================================================ */
+function doPrint(){
+  const es=S.eScore, rs=S.rScore, g=S.grp;
+  const eEq=getEq(es,'exp'), rEq=getEq(rs,'rec');
+  const eP=getPct(es,g,'exp'), rP=getPct(rs,g,'rec');   // 객체 {label,val,barPct}
+  const eSD=getSD(es,g,'exp'),  rSD=getSD(rs,g,'rec');
+  const nm=NORM[g];
+  const eWrong=Object.values(S.eI).filter(v=>v===false).length;
+  const rWrong=Object.values(S.rI).filter(v=>v===false).length;
+  const pC=p=>p>=25?'#2e7d32':p>=10?'#e65100':'#b71c1c';
+  const sC=lv=>lv===1?'#2e7d32':lv===-1?'#e65100':'#b71c1c';
+  const sBadge=lv=>lv===1?'badge-ok':lv===-1?'badge-warn':'badge-bad';
+
+  const html=`<!DOCTYPE html>
+<html lang="ko"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>REVT 결과지 — ${S.name}</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Malgun Gothic','Apple SD Gothic Neo','Noto Sans KR',sans-serif;font-size:13px;color:#1a1a1a;background:#fff}
+@page{size:A4;margin:14mm 14mm 18mm}
+.page{max-width:720px;margin:0 auto;padding:28px 24px}
+/* 헤더 */
+.rh{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #c2185b;padding-bottom:14px;margin-bottom:20px}
+.rh-left h1{font-size:19px;font-weight:800;color:#c2185b;letter-spacing:-.5px}
+.rh-left p{font-size:11px;color:#999;margin-top:3px}
+.rh-right{font-size:11px;color:#999;text-align:right;line-height:1.7}
+/* 아동 정보 */
+.info-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.info-box{background:#fdf0f8;border-radius:8px;padding:10px 13px;border:1px solid #f5c6e0}
+.info-box .lbl{font-size:10px;color:#c2185b;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:3px}
+.info-box .val{font-size:14px;font-weight:700}
+.info-box .sub{font-size:10px;color:#666;margin-top:1px}
+/* 섹션 */
+.sec{margin-bottom:20px}
+.sec-title{font-size:13px;font-weight:800;border-left:4px solid #c2185b;padding-left:10px;margin-bottom:12px}
+/* 요약 카드 */
+.sum-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.sum-box{border-radius:10px;padding:13px 14px;border:1px solid #e0e0e0}
+.sum-box.exp{background:#fdf0f8;border-color:#f5c6e0}
+.sum-box.rec{background:#e3f2fd;border-color:#90caf9}
+.sum-box h3{font-size:13px;font-weight:800;margin-bottom:10px}
+.sum-box h3.exp{color:#c2185b}.sum-box h3.rec{color:#1565c0}
+.sum-line{display:flex;justify-content:space-between;padding:4px 0;font-size:12px;border-bottom:1px solid rgba(0,0,0,.06)}
+.sum-line:last-child{border-bottom:none}
+.sum-line .k{color:#666}
+.sum-line .v{font-weight:700}
+.score-big{font-size:20px;font-weight:800}
+/* 뱃지 */
+.badge-ok{display:inline-block;background:#e8f5e9;color:#2e7d32;padding:2px 9px;border-radius:12px;font-size:11px;font-weight:700}
+.badge-warn{display:inline-block;background:#fff3e0;color:#e65100;padding:2px 9px;border-radius:12px;font-size:11px;font-weight:700}
+.badge-bad{display:inline-block;background:#ffebee;color:#b71c1c;padding:2px 9px;border-radius:12px;font-size:11px;font-weight:700}
+/* 표 */
+table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:4px}
+th{background:#f9f0f5;color:#c2185b;font-weight:700;padding:8px 10px;border:1px solid #f0d0e0;font-size:11px;text-align:left}
+td{padding:8px 10px;border:1px solid #eee;vertical-align:middle}
+tr:nth-child(even) td{background:#fafafa}
+/* 바 */
+.bar-track{height:12px;background:#f0f0f0;border-radius:6px;overflow:hidden;border:1px solid #e0e0e0;margin-top:6px}
+.bar-fill{height:100%;border-radius:6px;display:flex;align-items:center;justify-content:flex-end;padding-right:6px}
+.bar-fill span{font-size:9px;color:#fff;font-weight:700}
+/* 안내 */
+.guide{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:11px 13px;margin-top:16px;font-size:11px;color:#0369a1;line-height:1.8}
+.guide b{color:#0369a1}
+.footer{margin-top:20px;padding-top:12px;border-top:1px solid #eee;font-size:10px;color:#999;text-align:center}
+@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style></head><body>
+<div class="page">
+  <div class="rh">
+    <div class="rh-left">
+      <h1>REVT 수용·표현 어휘력 검사 결과지</h1>
+      <p>Receptive &amp; Expressive Vocabulary Test (김영태 외, 2009)</p>
+    </div>
+    <div class="rh-right">평가일: ${S.testDate}<br>출력일: ${new Date().toLocaleDateString('ko-KR')}</div>
+  </div>
+
+  <div class="info-row">
+    <div class="info-box"><div class="lbl">아동 이름</div><div class="val">${S.name}</div></div>
+    <div class="info-box"><div class="lbl">생년월일</div><div class="val">${S.birthDate}</div></div>
+    <div class="info-box"><div class="lbl">생활연령</div><div class="val">만 ${S.y}세 ${S.m}개월</div><div class="sub">${g} · ${S.tm}개월</div></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">종합 결과 요약</div>
+    <div class="sum-row">
+      <div class="sum-box exp">
+        <h3 class="exp">📢 표현어휘력</h3>
+        <div class="sum-line"><span class="k">원점수</span><span class="v score-big" style="color:#c2185b">${es}점</span></div>
+        <div class="sum-line"><span class="k">등가월령</span><span class="v">${eEq.mo}</span></div>
+        <div class="sum-line"><span class="k">등가연령</span><span class="v">${eEq.st}</span></div>
+        <div class="sum-line"><span class="k">백분위</span><span class="v" style="color:${pC(eP.val)}">${eP.label}</span></div>
+        <div class="sum-line"><span class="k">SD 판정</span><span class="${sBadge(eSD.lv)}">${eSD.l}</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:${eP.barPct}%;background:#c2185b"><span>${eP.label}</span></div></div>
+      </div>
+      <div class="sum-box rec">
+        <h3 class="rec">👂 수용어휘력</h3>
+        <div class="sum-line"><span class="k">원점수</span><span class="v score-big" style="color:#1565c0">${rs}점</span></div>
+        <div class="sum-line"><span class="k">등가월령</span><span class="v">${rEq.mo}</span></div>
+        <div class="sum-line"><span class="k">등가연령</span><span class="v">${rEq.st}</span></div>
+        <div class="sum-line"><span class="k">백분위</span><span class="v" style="color:${pC(rP.val)}">${rP.label}</span></div>
+        <div class="sum-line"><span class="k">SD 판정</span><span class="${sBadge(rSD.lv)}">${rSD.l}</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:${rP.barPct}%;background:#1565c0"><span>${rP.label}</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">규준 비교 — 표-27 연령별 평균 및 표준편차 (연령 집단: ${g})</div>
+    ${nm?`<table>
+      <tr><th>구분</th><th>원점수</th><th>연령 평균</th><th>표준편차</th><th>-1SD 기준</th><th>-2SD 기준</th><th>판정</th></tr>
+      <tr><td>표현어휘</td><td style="font-size:16px;font-weight:800;color:#c2185b">${es}</td><td>${nm.exp.mean}</td><td>${nm.exp.sd}</td>
+          <td style="color:#e65100;font-weight:700">${(nm.exp.mean-nm.exp.sd).toFixed(2)}</td>
+          <td style="color:#b71c1c;font-weight:700">${(nm.exp.mean-2*nm.exp.sd).toFixed(2)}</td>
+          <td><span class="${sBadge(eSD.lv)}">${eSD.l}</span></td></tr>
+      <tr><td>수용어휘</td><td style="font-size:16px;font-weight:800;color:#1565c0">${rs}</td><td>${nm.rec.mean}</td><td>${nm.rec.sd}</td>
+          <td style="color:#e65100;font-weight:700">${(nm.rec.mean-nm.rec.sd).toFixed(2)}</td>
+          <td style="color:#b71c1c;font-weight:700">${(nm.rec.mean-2*nm.rec.sd).toFixed(2)}</td>
+          <td><span class="${sBadge(rSD.lv)}">${rSD.l}</span></td></tr>
+    </table>`:'<p style="color:#999;font-size:12px">해당 연령 규준 없음</p>'}
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">등가연령 규준 — 표-28</div>
+    <table>
+      <tr><th>구분</th><th>원점수</th><th>등가월령</th><th>등가연령</th></tr>
+      <tr><td>표현어휘</td><td>${es}점</td><td>${eEq.mo}</td><td>${eEq.st}</td></tr>
+      <tr><td>수용어휘</td><td>${rs}점</td><td>${rEq.mo}</td><td>${rEq.st}</td></tr>
+    </table>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">백분위 규준 — 표-29 (연령 집단: ${g})</div>
+    <table>
+      <tr><th>구분</th><th>원점수</th><th>백분위</th><th>해석</th></tr>
+      <tr><td>표현어휘</td><td>${es}점</td>
+          <td style="color:${pC(eP.val)};font-weight:800">${eP.label}</td>
+          <td>${eP.val>=50?'평균 이상':eP.val>=25?'평균 하':eP.val>=10?'약간 낮음':'매우 낮음'}</td></tr>
+      <tr><td>수용어휘</td><td>${rs}점</td>
+          <td style="color:${pC(rP.val)};font-weight:800">${rP.label}</td>
+          <td>${rP.val>=50?'평균 이상':rP.val>=25?'평균 하':rP.val>=10?'약간 낮음':'매우 낮음'}</td></tr>
+    </table>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">검사 실시 정보</div>
+    <table>
+      <tr><th>구분</th><th>기초선</th><th>최고한계선</th><th>오답 수</th><th>원점수</th></tr>
+      <tr><td>표현어휘</td><td>${S.eBL?S.eBL+'번':'미확립'}</td><td>${S.eCL?S.eCL+'번':'끝까지 실시'}</td><td>${eWrong}개</td><td>${es}점</td></tr>
+      <tr><td>수용어휘</td><td>${S.rBL?S.rBL+'번':'미확립'}</td><td>${S.rCL?S.rCL+'번':'끝까지 실시'}</td><td>${rWrong}개</td><td>${rs}점</td></tr>
+    </table>
+  </div>
+
+  <div class="guide">
+    <b>📌 검사 해석 안내</b><br>
+    • <b>정상범주</b>: 연령 평균 -1SD 이상 &nbsp;|&nbsp; <b>약간 낮음</b>: -1SD ~ -2SD &nbsp;|&nbsp; <b>언어발달지연</b>: -2SD 미만<br>
+    • 백분위 <b>10%ile 미만</b>은 언어치료적 개입을 적극 고려하시기 바랍니다.<br>
+    • 본 결과는 REVT(수용·표현 어휘력 검사, 김영태·홍경훈·김경희·장혜성·이주연, 서울장애인종합복지관, 2009) 규준에 따라 산출되었습니다.
+  </div>
+
+  <div class="footer">
+    REVT 수용·표현 어휘력 검사 결과지 &nbsp;|&nbsp; ${S.name} &nbsp;|&nbsp; 평가일 ${S.testDate} &nbsp;|&nbsp; 출력일 ${new Date().toLocaleDateString('ko-KR')}
+  </div>
+</div>
+<script>window.onload=function(){window.print();}<\/script>
+</body></html>`;
+
+  const w=window.open('','_blank','width=820,height=960');
+  if(!w){alert('팝업이 차단되었습니다.\n브라우저에서 팝업 허용 후 다시 시도해 주세요.');return;}
+  w.document.write(html);
+  w.document.close();
+}
+
+/* ============================================================
+   초기 실행
+============================================================ */
+render();
+</script>
+</body>
+</html>
